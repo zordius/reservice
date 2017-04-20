@@ -168,6 +168,7 @@ describe('reservice', () => {
        middleware = createMiddlewareByServiceList({
          foo: (param1) => param1,
          bar: (p1, p2) => ({p1, p2}),
+         err: () => {throw new Error('bad')},
        });
        expect(setupServiceEndpoint).toThrow(new Error('Wrong setupServiceEndpoint() ! You should to it before serviceMiddleware(serviceList) !'));
     });
@@ -227,23 +228,45 @@ describe('reservice', () => {
         }
       });
     });
-  });
 
-  describe('executeServiceAtServer()', () => {
-    xit('should reject when service not found', () => executeServiceAtServer({ meta: { serviceName: 'TEST' } }).then(fail, (error) => {
-      expect(error).toEqual({
-        type: 'CALL_SERVICE',
-        payload: new ReserviceError('can not find service named as "TEST" in serviceList'),
-        error: true,
-        meta: {
-          serviceState: 'END',
-          previous_action: {
-            meta: {
-              serviceName: 'TEST',
-            },
+    it('should report error when service not found', (done) => {
+      const req = {
+        originalUrl: '/',
+        method: 'POST',
+        body: {
+          type: 'CALL_SERVICE',
+          meta: {
+            serviceName: 'not_found',
+            serviceState: 'CREATED',
           },
-        },
+        }
+      };
+      middleware(req, {
+        send: (err) => {
+          expect(err).toEqual(new ReserviceError('can not find service named as "not_found" in serviceList'));
+          done();
+        }
       });
-    }));
+    });
+
+    it('should report error in service', (done) => {
+      const req = {
+        originalUrl: '/',
+        method: 'POST',
+        body: {
+          type: 'CALL_SERVICE',
+          meta: {
+            serviceName: 'err',
+            serviceState: 'CREATED',
+          },
+        }
+      };
+      middleware(req, {
+        send: (err) => {
+          expect(err).toEqual(new Error('bad'));
+          done();
+        }
+      });
+    });
   });
 });
