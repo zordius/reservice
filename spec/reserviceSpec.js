@@ -1,4 +1,4 @@
-import { ReserviceError, createService, isBadService, isService, setupServiceEndpoint, createMiddlewareByServiceList } from '../src';
+import { ReserviceError, createService, isBadService, isService, setupServiceEndpoint, createMiddlewareByServiceList, handleServiceActions } from '../src';
 
 describe('reservice', () => {
   let middleware;
@@ -152,12 +152,12 @@ describe('reservice', () => {
     });
 
     it('should error when no serviceList', () => {
-       expect(createMiddlewareByServiceList).toThrow(new Error('No serviceList for service middleware! Check the serviceList in your createMiddlewareByServiceList(serviceList)'));
+      expect(createMiddlewareByServiceList).toThrow(new Error('No serviceList for service middleware! Check the serviceList in your createMiddlewareByServiceList(serviceList)'));
     });
 
     it('should error when at client side', () => {
       global.window = true;
-       expect(() => createMiddlewareByServiceList({})).toThrow(new Error('createMiddlewareByServiceList() should not be executed at client side!'));
+      expect(() => createMiddlewareByServiceList({})).toThrow(new Error('createMiddlewareByServiceList() should not be executed at client side!'));
     });
   });
 
@@ -165,18 +165,18 @@ describe('reservice', () => {
     it('should be ok', () => setupServiceEndpoint('/', 'POST'));
 
     it('should throw when executed after createMiddlewareByServiceList()', () => {
-       middleware = createMiddlewareByServiceList({
-         foo: (param1) => param1,
-         bar: (p1, p2) => ({p1, p2}),
-         err: () => {throw new Error('bad')},
-       });
-       expect(setupServiceEndpoint).toThrow(new Error('Wrong setupServiceEndpoint() ! You should to it before serviceMiddleware(serviceList) !'));
+      middleware = createMiddlewareByServiceList({
+        foo: param1 => param1,
+        bar: (p1, p2) => ({ p1, p2 }),
+        err: () => { throw new Error('bad'); },
+      });
+      expect(setupServiceEndpoint).toThrow(new Error('Wrong setupServiceEndpoint() ! You should to it before serviceMiddleware(serviceList) !'));
     });
   });
 
   describe('createMiddlewareByServiceList()', () => {
     it('should error when executed twice', () => {
-       expect(() => createMiddlewareByServiceList({})).toThrow(new Error('createMiddlewareByServiceList() should be executed once only!'));
+      expect(() => createMiddlewareByServiceList({})).toThrow(new Error('createMiddlewareByServiceList() should be executed once only!'));
     });
 
     it('should call next when url is not matched', () => {
@@ -219,13 +219,13 @@ describe('reservice', () => {
             serviceName: 'foo',
             serviceState: 'CREATED',
           },
-        }
+        },
       };
       middleware(req, {
         send: (act) => {
           expect(act).toEqual(req);
           done();
-        }
+        },
       });
     });
 
@@ -239,13 +239,13 @@ describe('reservice', () => {
             serviceName: 'not_found',
             serviceState: 'CREATED',
           },
-        }
+        },
       };
       middleware(req, {
         send: (err) => {
           expect(err).toEqual(new ReserviceError('can not find service named as "not_found" in serviceList'));
           done();
-        }
+        },
       });
     });
 
@@ -259,14 +259,40 @@ describe('reservice', () => {
             serviceName: 'err',
             serviceState: 'CREATED',
           },
-        }
+        },
       };
       middleware(req, {
         send: (err) => {
           expect(err).toEqual(new Error('bad'));
           done();
-        }
+        },
       });
+    });
+  });
+
+  describe('handleServiceActions()', () => {
+    const doneService = (name) => {
+      const act = createService(name)();
+      act.meta.serviceState = 'END';
+      return act;
+    };
+
+    it('should create default reducer when no input', () => {
+      expect(handleServiceActions()()).toEqual({});
+    });
+
+    it('should create reducer to handle default state', () => {
+      expect(handleServiceActions(undefined, { foo: 'bar' })()).toEqual({ foo: 'bar' });
+    });
+
+    it('should lookup service list then bypass not matched action', () => {
+      expect(handleServiceActions({}, { foo: 'bar' })(undefined, doneService('TEST'))).toEqual({ foo: 'bar' });
+    });
+
+    it('should execute matched reducer', () => {
+      const reducer = jasmine.createSpy('reducer');
+      handleServiceActions({ foo: reducer })(3, doneService('foo'));
+      expect(reducer).toHaveBeenCalledWith(3, doneService('foo'));
     });
   });
 });
