@@ -294,5 +294,18 @@ describe('reservice', () => {
       handleServiceActions({ foo: reducer })(3, doneService('foo'));
       expect(reducer).toHaveBeenCalledWith(3, doneService('foo'));
     });
+
+    it('should execute .next when success', () => {
+      const reducer = jasmine.createSpy('reducer');
+      handleServiceActions({ foo: { next: reducer }})(3, doneService('foo'));
+      expect(reducer).toHaveBeenCalledWith(3, doneService('foo'));
+    });
+
+    it('should execute .throw when failed', () => {
+      const reducer = jasmine.createSpy('reducer');
+      const failService = { ...doneService('foo'), error: true };
+      handleServiceActions({ foo: { throw: reducer }})(3, failService);
+      expect(reducer).toHaveBeenCalledWith(3, failService);
+    });
   });
 });
