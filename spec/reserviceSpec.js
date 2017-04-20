@@ -1,4 +1,4 @@
-import { ReserviceError, createService } from '../../src/lib/reservice'
+import { ReserviceError, createService } from '../reservice'
 
 describe('lib/reservice', () => {
     describe('ReserviceError', () => {

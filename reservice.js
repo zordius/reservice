@@ -1,6 +1,5 @@
-import { createAction } from 'redux-actions'
-import { overwriteFunctionName } from './common'
-import yfetch from 'yfetch'
+import { createAction } from 'redux-actions';
+import yfetch from 'yfetch';
 
 export const ACTION_CALL_SERVICE = 'CALL_SERVICE';
 export const STATE_CREATED = 'CREATED';
@@ -157,7 +156,7 @@ const executeServiceAtServer = (request, action) => {
 };
 
 // A helper function to help you to create a reducer for services
-export const handleServiceActions = (name, serviceReducers = {}, defaultState = {}) => overwriteFunctionName(name, (state = defaultState, action) => {
+export const handleServiceActions = (serviceReducers = {}, defaultState = {}) => (state = defaultState, action) => {
     const srv = isService(action, true);
 
     if (!srv || srv.error || !isEnd(action)) {
@@ -178,7 +177,7 @@ export const handleServiceActions = (name, serviceReducers = {}, defaultState = 
     }
 
     return reducer(state, action);
-});
+};
 
 const responseServiceResult = (res) => (result) => res.send(result);
 
