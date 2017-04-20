@@ -7,10 +7,10 @@ export const STATE_CREATED = 'CREATED';
 export const STATE_BEGIN = 'BEGIN';
 export const STATE_END = 'END';
 
-const CUSTOMIZED_TRANSPORT_PATH = process.env.RESERVICE_BASE || '';
-const CUSTOMIZED_TRANSPORT_METHOD = process.env.RESERVICE_METHOD || '';
-const SERVICE_TRANSPORT_PATH = (CUSTOMIZED_TRANSPORT_PATH === '') ? '/_service_/' : CUSTOMIZED_TRANSPORT_PATH;
-const SERVICE_TRANSPORT_METHOD = (CUSTOMIZED_TRANSPORT_PATH === '') ? 'PUT' : CUSTOMIZED_TRANSPORT_METHOD;
+const DEFAULT_TRANSPORT_PATH = '/_reservice_/';
+const DEFAULT_TRANSPORT_METHOD = 'PUT';
+let SERVICE_TRANSPORT_PATH = DEFAULT_TRANSPORT_PATH;
+let SERVICE_TRANSPORT_METHOD = DEFAULT_TRANSPORT_METHOD;
 
 let SERVICE_LIST = 0;
 
@@ -102,7 +102,7 @@ const executeServiceAtServer = (request, action) => {
   const service = SERVICE_LIST[serviceName];
 
   if (!service) {
-    return Promise.reject(new Error(`can not find service named as "${serviceName}" in serviceList`));
+    return Promise.reject(new ReserviceError(`can not find service named as "${serviceName}" in serviceList`, action));
   }
 
   try {
@@ -119,6 +119,14 @@ const transportServiceToServer = action => yfetch({
   url: SERVICE_TRANSPORT_PATH,
   body: JSON.stringify(action),
 }).then(result => result.body);
+
+export const setupServiceEndpoint = (url, method = DEFAULT_TRANSPORT_METHOD) => {
+  if (SERVICE_LIST) {
+    throw new ReserviceError('Wrong setupServiceEndpoint() ! You should to it before serviceMiddleware(serviceList) !');
+  }
+  SERVICE_TRANSPORT_PATH = url;
+  SERVICE_TRANSPORT_METHOD = method;
+};
 
 // A redux middleware creator, the first parameter is the serviceList
 export const serviceMiddleware = store => next => (action) => {
