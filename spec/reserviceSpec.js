@@ -1,4 +1,4 @@
-import { ReserviceError, createService } from '../src';
+import { ReserviceError, createService, isBadService, isService } from '../src';
 
 describe('reservice', () => {
   describe('ReserviceError', () => {
@@ -55,6 +55,73 @@ describe('reservice', () => {
           serviceState: 'CREATED',
         },
       });
+    });
+  });
+
+  describe('isBadService()', () => {
+    it('should detect no meta issue', () => {
+      expect(isBadService({ type: 'CALL_SERVICE' })).toEqual({
+        type: 'CALL_SERVICE',
+        payload: new ReserviceError('no action.meta', { type: 'CALL_SERVICE' }),
+        error: true,
+        meta: {
+          serviceState: 'END',
+          previous_action: {
+            type: 'CALL_SERVICE',
+          },
+        },
+      });
+    });
+
+    it('should detect no meta.serviceName issue', () => {
+      expect(isBadService({ type: 'CALL_SERVICE', meta: {} })).toEqual({
+        type: 'CALL_SERVICE',
+        payload: new ReserviceError('no action.meta.serviceName'),
+        error: true,
+        meta: {
+          serviceState: 'END',
+          previous_action: {
+            type: 'CALL_SERVICE',
+            meta: {},
+          },
+        },
+      });
+    });
+
+    it('should detect no meta.serviceState issue', () => {
+      expect(isBadService({ type: 'CALL_SERVICE', meta: { serviceName: 'OK' } })).toEqual({
+        type: 'CALL_SERVICE',
+        payload: new ReserviceError('no action.meta.serviceState'),
+        error: true,
+        meta: {
+          serviceName: 'OK',
+          serviceState: 'END',
+          previous_action: {
+            type: 'CALL_SERVICE',
+            meta: {
+              serviceName: 'OK',
+            },
+          },
+        },
+      });
+    });
+  });
+
+  describe('isService()', () => {
+    it('should return true when service is valid', () => {
+      expect(isService(createService('TEST')())).toEqual(true);
+    });
+
+    it('should return false when no input', () => {
+      expect(isService()).toEqual(false);
+    });
+
+    it('should return false when is not service action', () => {
+      expect(isService({ type: 'any' })).toEqual(false);
+    });
+
+    it('should return false when is not a valid service action', () => {
+      expect(isService({ type: 'CALL_SERVICE' })).toEqual(null);
     });
   });
 });

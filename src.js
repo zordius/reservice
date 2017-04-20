@@ -45,8 +45,8 @@ const resultAction = (action, payload) => {
   const error = payload instanceof Error;
 
   if (error) {
-    debugFail('name: %s - payload: %o - error: %s', action.meta.serviceName, action.payload, payload);
-    debugError('name: %s - payload: %o - stack: %s', action.meta.serviceName, action.payload, payload.stack);
+    debugFail('name: %s - payload: %o - error: %s', action.meta ? action.meta.serviceName : undefined, action.payload, payload);
+    debugError('name: %s - payload: %o - stack: %s', action.meta ? action.meta.serviceName : undefined, action.payload, payload.stack);
   } else {
     debugSuccess('name: %s - payload: %o - result: %o', action.meta.serviceName, action.payload, payload);
   }
@@ -77,7 +77,7 @@ export const isBadService = (action) => {
 };
 
 // check an action is service action or not, may return FSA error action if you like
-export const isService = (action, returnErrorAction) => {
+export const isService = (action = {}, returnErrorAction) => {
   if (action.type !== ACTION_CALL_SERVICE) {
     return false;
   }
