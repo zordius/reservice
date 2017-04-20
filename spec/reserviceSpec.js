@@ -1,6 +1,8 @@
-import { ReserviceError, createService, isBadService, isService } from '../src';
+import { ReserviceError, createService, isBadService, isService, setupServiceEndpoint, createMiddlewareByServiceList } from '../src';
 
 describe('reservice', () => {
+  let middleware;
+
   describe('ReserviceError', () => {
     it('should be a standard Error', () => {
       expect(new ReserviceError('test') instanceof Error).toBe(true);
@@ -123,5 +125,125 @@ describe('reservice', () => {
     it('should return false when is not a valid service action', () => {
       expect(isService({ type: 'CALL_SERVICE' })).toEqual(null);
     });
+
+    it('should return error action when required', () => {
+      expect(isService({ type: 'CALL_SERVICE' }, true)).toEqual({
+        type: 'CALL_SERVICE',
+        payload: new ReserviceError('no action.meta'),
+        error: true,
+        meta: {
+          serviceState: 'END',
+          previous_action: {
+            type: 'CALL_SERVICE',
+          },
+        },
+      });
+    });
+  });
+
+  describe('createMiddlewareByServiceList() error', () => {
+    let oldWindow;
+
+    beforeAll(() => {
+      oldWindow = global.window;
+    });
+    afterAll(() => {
+      global.window = oldWindow;
+    });
+
+    it('should error when no serviceList', () => {
+       expect(createMiddlewareByServiceList).toThrow(new Error('No serviceList for service middleware! Check the serviceList in your createMiddlewareByServiceList(serviceList)'));
+    });
+
+    it('should error when at client side', () => {
+      global.window = true;
+       expect(() => createMiddlewareByServiceList({})).toThrow(new Error('createMiddlewareByServiceList() should not be executed at client side!'));
+    });
+  });
+
+  describe('setupServiceEndpoint()', () => {
+    it('should be ok', () => setupServiceEndpoint('/', 'POST'));
+
+    it('should throw when executed after createMiddlewareByServiceList()', () => {
+       middleware = createMiddlewareByServiceList({
+         foo: (param1) => param1,
+         bar: (p1, p2) => ({p1, p2}),
+       });
+       expect(setupServiceEndpoint).toThrow(new Error('Wrong setupServiceEndpoint() ! You should to it before serviceMiddleware(serviceList) !'));
+    });
+  });
+
+  describe('createMiddlewareByServiceList()', () => {
+    it('should error when executed twice', () => {
+       expect(() => createMiddlewareByServiceList({})).toThrow(new Error('createMiddlewareByServiceList() should be executed once only!'));
+    });
+
+    it('should call next when url is not matched', () => {
+      const next = jasmine.createSpy('next');
+      middleware({ originalUrl: 'ooxx' }, undefined, next);
+      expect(next).toHaveBeenCalled();
+    });
+
+    it('should call next when method is not matched', () => {
+      const next = jasmine.createSpy('next');
+      middleware({ originalUrl: '/' }, undefined, next);
+      expect(next).toHaveBeenCalled();
+    });
+
+    it('should call next when no req.body', () => {
+      const next = jasmine.createSpy('next');
+      middleware({ originalUrl: '/', method: 'POST' }, undefined, next);
+      expect(next).toHaveBeenCalled();
+    });
+
+    it('should call next when action is not service action', () => {
+      const next = jasmine.createSpy('next');
+      middleware({ originalUrl: '/', method: 'POST', body: {} }, undefined, next);
+      expect(next).toHaveBeenCalled();
+    });
+
+    it('should call next with error when action is not a valid service action', () => {
+      const next = jasmine.createSpy('next');
+      middleware({ originalUrl: '/', method: 'POST', body: { type: 'CALL_SERVICE' } }, undefined, next);
+      expect(next).toHaveBeenCalledWith(new ReserviceError('no action.meta'));
+    });
+
+    it('should execute service', (done) => {
+      const req = {
+        originalUrl: '/',
+        method: 'POST',
+        body: {
+          type: 'CALL_SERVICE',
+          meta: {
+            serviceName: 'foo',
+            serviceState: 'CREATED',
+          },
+        }
+      };
+      middleware(req, {
+        send: (act) => {
+          expect(act).toEqual(req);
+          done();
+        }
+      });
+    });
+  });
+
+  describe('executeServiceAtServer()', () => {
+    xit('should reject when service not found', () => executeServiceAtServer({ meta: { serviceName: 'TEST' } }).then(fail, (error) => {
+      expect(error).toEqual({
+        type: 'CALL_SERVICE',
+        payload: new ReserviceError('can not find service named as "TEST" in serviceList'),
+        error: true,
+        meta: {
+          serviceState: 'END',
+          previous_action: {
+            meta: {
+              serviceName: 'TEST',
+            },
+          },
+        },
+      });
+    }));
   });
 });
