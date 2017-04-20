@@ -1,0 +1,22 @@
+{
+  "name": "reservice",
+  "version": "0.0.1",
+  "description": "An isomorphic async tasks solution for redux",
+  "main": "reservice.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zordius/reservice.git"
+  },
+  "keywords": [
+    "redux"
+  ],
+  "author": "zordius@yahoo-inc.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zordius/reservice/issues"
+  },
+  "homepage": "https://github.com/zordius/reservice#readme"
+}
