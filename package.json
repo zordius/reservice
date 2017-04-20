@@ -2,8 +2,10 @@
   "name": "reservice",
   "version": "0.0.1",
   "description": "An isomorphic async tasks solution for redux",
-  "main": "reservice.js",
+  "main": "index.js",
   "scripts": {
+    "lint": "eslint src.js spec",
+    "build": "NODE_ENV=build babel src.js -o index.js",
     "test": "NODE_ENV=test nyc jasmine"
   },
   "repository": {
@@ -20,6 +22,7 @@
   },
   "homepage": "https://github.com/zordius/reservice#readme",
   "devDependencies": {
+    "babel-cli": "^6.24.1",
     "babel-plugin-istanbul": "^4.1.1",
     "babel-plugin-transform-builtin-extend": "^1.1.2",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",

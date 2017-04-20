@@ -1,6 +1,6 @@
-import { ReserviceError, createService } from '../reservice'
+import { ReserviceError, createService } from '../src'
 
-describe('lib/reservice', () => {
+describe('reservice', () => {
     describe('ReserviceError', () => {
         it('should be a standard Error', () => {
             expect(new ReserviceError('test') instanceof Error).toBe(true);

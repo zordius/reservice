@@ -3,7 +3,7 @@
       "babel-register"
     ],
     "include": [
-      "reservice.js"
+      "src.js"
     ],
     "reporter": [
       "lcov",
