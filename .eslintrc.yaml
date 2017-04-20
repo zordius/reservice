@@ -1,0 +1,11 @@
+parser: babel-eslint
+extends: airbnb-base
+env:
+  node: true,
+  jasmine: true
+rules:
+  # override 2 rules for spec/
+  #import/no-mutable-exports: 0
+  #import/no-dynamic-require: 0
+  # override 1 rule to decorate Error
+  no-param-reassign: 0
