@@ -1,7 +1,22 @@
-import { ReserviceError, createService, isBadService, isService, setupServiceEndpoint, createMiddlewareByServiceList, serviceMiddleware, handleServiceActions } from '../src';
+import * as reservice from '../src';
+
+const { ReserviceError, createService, isBadService,
+        isService, setupServiceEndpoint, createMiddlewareByServiceList,
+        serviceMiddleware, handleServiceActions } = reservice;
 
 describe('reservice', () => {
   let middleware;
+
+  const doneService = (name) => {
+    const act = createService(name)();
+    act.meta.serviceState = 'END';
+    return act;
+  };
+
+  const mockStore = () => ({
+    req: 123,
+    dispatch: jasmine.createSpy('dispatch'),
+  });
 
   describe('ReserviceError', () => {
     it('should be a standard Error', () => {
@@ -152,12 +167,18 @@ describe('reservice', () => {
     });
 
     it('should error when no serviceList', () => {
-      expect(createMiddlewareByServiceList).toThrow(new Error('No serviceList for service middleware! Check the serviceList in your createMiddlewareByServiceList(serviceList)'));
+      expect(createMiddlewareByServiceList).toThrow(new ReserviceError('No serviceList for service middleware! Check the serviceList in your createMiddlewareByServiceList(serviceList)'));
     });
 
     it('should error when at client side', () => {
       global.window = true;
-      expect(() => createMiddlewareByServiceList({})).toThrow(new Error('createMiddlewareByServiceList() should not be executed at client side!'));
+      expect(() => createMiddlewareByServiceList({})).toThrow(new ReserviceError('createMiddlewareByServiceList() should not be executed at client side!'));
+    });
+  });
+
+  describe('serviceMiddleware() error', () => {
+    it('should throw when service_list is not provided', () => {
+      expect(() => serviceMiddleware(mockStore())(() => 0)(createService('test')())).toThrow(new ReserviceError('Wrong serviceMiddleware() at server side! You should create service middleware by serviceMiddleware(serviceList) !'));
     });
   });
 
@@ -168,15 +189,15 @@ describe('reservice', () => {
       middleware = createMiddlewareByServiceList({
         foo: param1 => param1,
         bar: (p1, p2) => ({ p1, p2 }),
-        err: () => { throw new Error('bad'); },
+        err: () => { throw new ReserviceError('bad'); },
       });
-      expect(setupServiceEndpoint).toThrow(new Error('Wrong setupServiceEndpoint() ! You should to it before serviceMiddleware(serviceList) !'));
+      expect(setupServiceEndpoint).toThrow(new ReserviceError('Wrong setupServiceEndpoint() ! You should to it before serviceMiddleware(serviceList) !'));
     });
   });
 
   describe('createMiddlewareByServiceList()', () => {
     it('should error when executed twice', () => {
-      expect(() => createMiddlewareByServiceList({})).toThrow(new Error('createMiddlewareByServiceList() should be executed once only!'));
+      expect(() => createMiddlewareByServiceList({})).toThrow(new ReserviceError('createMiddlewareByServiceList() should be executed once only!'));
     });
 
     it('should call next when url is not matched', () => {
@@ -263,7 +284,7 @@ describe('reservice', () => {
       };
       middleware(req, {
         send: (err) => {
-          expect(err).toEqual(new Error('bad'));
+          expect(err).toEqual(new ReserviceError('bad'));
           done();
         },
       });
@@ -273,20 +294,20 @@ describe('reservice', () => {
   describe('serviceMiddleware()', () => {
     it('should bypass when action is not service action', () => {
       const next = jasmine.createSpy('next');
-      serviceMiddleware(null)(next)({ foo: 'bar' });
+      serviceMiddleware()(next)({ foo: 'bar' });
       expect(next).toHaveBeenCalledWith({ foo: 'bar' });
     });
 
     it('should return next() result when action is not service action', () => {
-      expect(serviceMiddleware(null)(() => ({ foo: 'bar' }))({})).toEqual({ foo: 'bar' });
+      expect(serviceMiddleware()(() => ({ foo: 'bar' }))({})).toEqual({ foo: 'bar' });
     });
 
     it('should next() error action when action is bad service action', () => {
       const next = jasmine.createSpy('next');
-      serviceMiddleware(null)(next)({ type: 'CALL_SERVICE' });
+      serviceMiddleware()(next)({ type: 'CALL_SERVICE' });
       expect(next).toHaveBeenCalledWith({
         type: 'CALL_SERVICE',
-        payload: new Error('no action.meta'),
+        payload: new ReserviceError('no action.meta'),
         error: true,
         meta: {
           previous_action: {
@@ -298,17 +319,22 @@ describe('reservice', () => {
     });
 
     it('should return promise when input bad service action', () => {
-      expect(serviceMiddleware(null)(() => 0)({ type: 'CALL_SERVICE' }).then).toEqual(jasmine.any(Function));
+      expect(serviceMiddleware()(() => 0)({ type: 'CALL_SERVICE' }).then).toEqual(jasmine.any(Function));
+    });
+
+    it('should bypass when action is done', () => {
+      const next = jasmine.createSpy('next');
+      const act = doneService('test');
+      serviceMiddleware()(next)(act);
+      expect(next).toHaveBeenCalledWith(act);
+    });
+
+    it('should return next() result when action is done', () => {
+      expect(serviceMiddleware()(() => ({ foo: 'bar' }))(doneService('test'))).toEqual({ foo: 'bar' });
     });
   });
 
   describe('handleServiceActions()', () => {
-    const doneService = (name) => {
-      const act = createService(name)();
-      act.meta.serviceState = 'END';
-      return act;
-    };
-
     it('should create default reducer when no input', () => {
       expect(handleServiceActions()()).toEqual({});
     });
