@@ -9,7 +9,7 @@
   env: {
     test: {
       plugins: [
-        'istanbul', 'transform-runtime'
+        'istanbul'
       ]
     }
   }
