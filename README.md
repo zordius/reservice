@@ -10,6 +10,8 @@ A better asynchronous task practice is: create your action as pure object, do as
 
 A redux service means: an asynchronous task triggered by a start service action. After it done, the result will be dispatched as another service done action.
 
+[reservice](reservice.svg)
+
 Re-service provides a good practice for all your asynchronous tasks, includes:
 * A helper function to create service action creator. (the action is <a href="https://github.com/acdlite/flux-standard-action">FSA</a> compliant)
 * A redux middleware to:
