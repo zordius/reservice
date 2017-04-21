@@ -1,11 +1,14 @@
 import * as reservice from '../src';
+import nock from 'nock';
 
 const { ReserviceError, createService, isBadService,
         isService, setupServiceEndpoint, createMiddlewareByServiceList,
         serviceMiddleware, handleServiceActions } = reservice;
 
 describe('reservice', () => {
-  let middleware;
+  const mockServerHOST = 'http://test';
+  const mockServerPATH = '/here';
+  const mockServerURL = mockServerHOST + mockServerPATH;
 
   const doneService = (name) => {
     const act = createService(name)();
@@ -16,6 +19,25 @@ describe('reservice', () => {
   const mockStore = () => ({
     req: 123,
     dispatch: jasmine.createSpy('dispatch'),
+  });
+
+  const serviceList = {
+    foo: param1 => param1,
+    bar: (p1, p2) => ({ p1, p2 }),
+    err: () => { throw new ReserviceError('bad'); },
+  };
+
+  let middleware;
+
+  beforeAll(() => {
+    nock(mockServerHOST)
+    .persist()
+    .post(mockServerPATH)
+    .reply(200, { foo: 'OK' })
+  });
+
+  afterAll(() => {
+    nock.cleanAll();
   });
 
   describe('ReserviceError', () => {
@@ -183,14 +205,47 @@ describe('reservice', () => {
   });
 
   describe('setupServiceEndpoint()', () => {
-    it('should be ok', () => setupServiceEndpoint('/', 'POST'));
+    it('should be ok', () => setupServiceEndpoint(mockServerURL, 'POST'));
+  });
 
-    it('should throw when executed after createMiddlewareByServiceList()', () => {
-      middleware = createMiddlewareByServiceList({
-        foo: param1 => param1,
-        bar: (p1, p2) => ({ p1, p2 }),
-        err: () => { throw new ReserviceError('bad'); },
+  describe('serviceMiddleware() at client', () => {
+    let oldWindow;
+
+    beforeAll(() => {
+      oldWindow = global.window;
+      global.window = 1;
+    });
+    afterAll(() => {
+      global.window = oldWindow;
+    });
+
+    it('should transportServiceToServer()', () => {
+      const store = mockStore();
+      return serviceMiddleware(store)(() => 0)(createService('foo')()).then(() => {
+        expect(store.dispatch).toHaveBeenCalledWith({
+          type: 'CALL_SERVICE',
+          payload: { foo: 'OK' },
+          error: false,
+          meta: {
+            serviceName: 'foo',
+            serviceState: 'END',
+            previous_action: {
+              type: 'CALL_SERVICE',
+              meta: {
+                serviceName: 'foo',
+                serviceState: 'CREATED',
+              },
+            },
+          },
+        });
       });
+    });
+  });
+
+  describe('setupServiceEndpoint() error', () => {
+    it('should be ok', () => setupServiceEndpoint(mockServerURL, 'POST'));
+    it('should throw when executed after createMiddlewareByServiceList()', () => {
+      middleware = createMiddlewareByServiceList(serviceList);
       expect(setupServiceEndpoint).toThrow(new ReserviceError('Wrong setupServiceEndpoint() ! You should to it before serviceMiddleware(serviceList) !'));
     });
   });
@@ -208,31 +263,31 @@ describe('reservice', () => {
 
     it('should call next when method is not matched', () => {
       const next = jasmine.createSpy('next');
-      middleware({ originalUrl: '/' }, undefined, next);
+      middleware({ originalUrl: mockServerURL }, undefined, next);
       expect(next).toHaveBeenCalled();
     });
 
     it('should call next when no req.body', () => {
       const next = jasmine.createSpy('next');
-      middleware({ originalUrl: '/', method: 'POST' }, undefined, next);
+      middleware({ originalUrl: mockServerURL, method: 'POST' }, undefined, next);
       expect(next).toHaveBeenCalled();
     });
 
     it('should call next when action is not service action', () => {
       const next = jasmine.createSpy('next');
-      middleware({ originalUrl: '/', method: 'POST', body: {} }, undefined, next);
+      middleware({ originalUrl: mockServerURL, method: 'POST', body: {} }, undefined, next);
       expect(next).toHaveBeenCalled();
     });
 
     it('should call next with error when action is not a valid service action', () => {
       const next = jasmine.createSpy('next');
-      middleware({ originalUrl: '/', method: 'POST', body: { type: 'CALL_SERVICE' } }, undefined, next);
+      middleware({ originalUrl: mockServerURL, method: 'POST', body: { type: 'CALL_SERVICE' } }, undefined, next);
       expect(next).toHaveBeenCalledWith(new ReserviceError('no action.meta'));
     });
 
     it('should execute service', (done) => {
       const req = {
-        originalUrl: '/',
+        originalUrl: mockServerURL,
         method: 'POST',
         body: {
           type: 'CALL_SERVICE',
@@ -252,7 +307,7 @@ describe('reservice', () => {
 
     it('should report error when service not found', (done) => {
       const req = {
-        originalUrl: '/',
+        originalUrl: mockServerURL,
         method: 'POST',
         body: {
           type: 'CALL_SERVICE',
@@ -272,7 +327,7 @@ describe('reservice', () => {
 
     it('should report error in service', (done) => {
       const req = {
-        originalUrl: '/',
+        originalUrl: mockServerURL,
         method: 'POST',
         body: {
           type: 'CALL_SERVICE',
@@ -331,6 +386,28 @@ describe('reservice', () => {
 
     it('should return next() result when action is done', () => {
       expect(serviceMiddleware()(() => ({ foo: 'bar' }))(doneService('test'))).toEqual({ foo: 'bar' });
+    });
+
+    it('should executeServiceAtServer()', () => {
+      const store = mockStore();
+      return serviceMiddleware(store)(() => 0)(createService('foo')()).then(() => {
+        expect(store.dispatch).toHaveBeenCalledWith({
+          type: 'CALL_SERVICE',
+          payload: 123,
+          error: false,
+          meta: {
+            serviceName: 'foo',
+            serviceState: 'END',
+            previous_action: {
+              type: 'CALL_SERVICE',
+              meta: {
+                serviceName: 'foo',
+                serviceState: 'BEGIN',
+              },
+            },
+          },
+        });
+      });
     });
   });
 

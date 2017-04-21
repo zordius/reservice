@@ -1,6 +1,7 @@
 {
     "require": [
-      "babel-register"
+      "babel-register",
+      "isomorphic-fetch"
     ],
     "include": [
       "src.js"
