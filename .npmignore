@@ -1,0 +1,12 @@
+.babelrc
+.eslintrc.yaml
+.npmignore
+.nyc_output/
+.nycrc
+.travis.yml
+coverage/
+coverage2/
+reservice.png
+src.js
+spec/
+travis.sh
