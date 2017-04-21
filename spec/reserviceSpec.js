@@ -1,4 +1,4 @@
-import { ReserviceError, createService, isBadService, isService, setupServiceEndpoint, createMiddlewareByServiceList, handleServiceActions } from '../src';
+import { ReserviceError, createService, isBadService, isService, setupServiceEndpoint, createMiddlewareByServiceList, serviceMiddleware, handleServiceActions } from '../src';
 
 describe('reservice', () => {
   let middleware;
@@ -270,6 +270,30 @@ describe('reservice', () => {
     });
   });
 
+  describe('serviceMiddleware()', () => {
+    it('should bypass when action is not service action', () => {
+      const next = jasmine.createSpy('next');
+      serviceMiddleware(null)(next)({ foo: 'bar' });
+      expect(next).toHaveBeenCalledWith({ foo: 'bar' });
+    });
+
+    it('should next() error action when action is bad service action', () => {
+      const next = jasmine.createSpy('next');
+      serviceMiddleware(null)(next)({ type: 'CALL_SERVICE' });
+      expect(next).toHaveBeenCalledWith({
+        type: 'CALL_SERVICE',
+        payload: new Error('no action.meta'),
+        error: true,
+        meta: {
+          previous_action: {
+            type: 'CALL_SERVICE',
+          },
+          serviceState: 'END',
+        },
+      });
+    });
+  });
+
   describe('handleServiceActions()', () => {
     const doneService = (name) => {
       const act = createService(name)();
@@ -297,14 +321,14 @@ describe('reservice', () => {
 
     it('should execute .next when success', () => {
       const reducer = jasmine.createSpy('reducer');
-      handleServiceActions({ foo: { next: reducer }})(3, doneService('foo'));
+      handleServiceActions({ foo: { next: reducer } })(3, doneService('foo'));
       expect(reducer).toHaveBeenCalledWith(3, doneService('foo'));
     });
 
     it('should execute .throw when failed', () => {
       const reducer = jasmine.createSpy('reducer');
       const failService = { ...doneService('foo'), error: true };
-      handleServiceActions({ foo: { throw: reducer }})(3, failService);
+      handleServiceActions({ foo: { throw: reducer } })(3, failService);
       expect(reducer).toHaveBeenCalledWith(3, failService);
     });
   });
