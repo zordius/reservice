@@ -1,24 +1,24 @@
 reservice
 =========
-An isomorphic asynchronous tasks solution for redux.
+An isomorphic/universal asynchronous tasks solution for redux.
 
 [![Build Status](https://travis-ci.org/zordius/reservice.svg?branch=master)](https://travis-ci.org/zordius/reservice)
 
 You may already using <a href="https://github.com/gaearon/redux-thunk">redux-thunk</a> for your asynchronous tasks. Put thunk, function or promise into an action makes it not pure, which means the action may not be serialized or replayed well.
 
-A better asynchronous task practice is: create your action as pure object, do asynchronous tasks in your own redux middlewares. This practice keep all your actions creators and reducers pure and clean, the only place you put asynchronous codes are redux middlewares....Or, a better place: service.
+A better asynchronous task practice is: create your action as pure object, do asynchronous tasks in your own redux middlewares. This practice keep all your actions creators and reducers pure and clean, make your application more isomorphic or universal. The only place you put asynchronous codes are redux middlewares....Or, a better place: redux service (re-service).
 
-A service means: an asynchronous task triggered by a start service action. After it done, the result will be dispatched as another service done action.
+A redux service means: an asynchronous task triggered by a start service action. After it done, the result will be dispatched as another service done action.
 
-Reservice provides a good practice for all your asynchronous tasks, includes:
+Re-service provides a good practice for all your asynchronous tasks, includes:
 * A helper function to create service action creator. (the action is <a href="https://github.com/acdlite/flux-standard-action">FSA</a> compliant)
 * A redux middleware to:
-  * handle the service action.
+  1. handle the service action
     * At client side, transport action to server then get result.
     * At server side, execute the service then get result.
-  * dispatch service result action
+  2. then ispatch service result action
 * A helper function to create reducer to handle service result actions.
-* Helper functions to idenfity a action:
+* Helper functions to idenfity an action:
   * is it a valid service action?
   * is it an ended service action?
   * is it a success service action?
