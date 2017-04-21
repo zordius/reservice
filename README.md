@@ -105,4 +105,8 @@ const store = createStore(
   myReducer,
   applyMiddleware(serviceMiddleware)
 );
+
+// IMPORTANT: attach the request object under the store
+// Required at server side.
+store.req = req;
 ```
