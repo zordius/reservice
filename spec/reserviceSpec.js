@@ -1,5 +1,5 @@
-import * as reservice from '../src';
 import nock from 'nock';
+import * as reservice from '../src';
 
 const { ReserviceError, createService, isBadService,
         isService, setupServiceEndpoint, createMiddlewareByServiceList,
@@ -33,7 +33,7 @@ describe('reservice', () => {
     nock(mockServerHOST)
     .persist()
     .post(mockServerPATH)
-    .reply(200, { foo: 'OK' })
+    .reply(200, { foo: 'OK' });
   });
 
   afterAll(() => {
