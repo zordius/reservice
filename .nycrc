@@ -1,7 +1,8 @@
 {
     "require": [
       "babel-register",
-      "isomorphic-fetch"
+      "isomorphic-fetch",
+      "babel-polyfill"
     ],
     "include": [
       "src.js"
