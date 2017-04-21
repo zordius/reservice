@@ -277,6 +277,10 @@ describe('reservice', () => {
       expect(next).toHaveBeenCalledWith({ foo: 'bar' });
     });
 
+    it('should return next() result when action is not service action', () => {
+      expect(serviceMiddleware(null)(() => ({ foo: 'bar' }))({})).toEqual({ foo: 'bar' });
+    });
+
     it('should next() error action when action is bad service action', () => {
       const next = jasmine.createSpy('next');
       serviceMiddleware(null)(next)({ type: 'CALL_SERVICE' });
@@ -291,6 +295,10 @@ describe('reservice', () => {
           serviceState: 'END',
         },
       });
+    });
+
+    it('should return promise when input bad service action', () => {
+      expect(serviceMiddleware(null)(() => 0)({ type: 'CALL_SERVICE' }).then).toEqual(jasmine.any(Function));
     });
   });
 
