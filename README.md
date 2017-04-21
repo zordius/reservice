@@ -67,9 +67,42 @@ expect(doSomeThing('good')).toEqual({
 
 **Service list:**
 ```javascript
-const services = {
+const serviceList = {
   [doSomeThing]: myService,
   [anotherServiceCreator]: theCodeOfAnotherService,
   ...
 }
+```
+
+**Handle service actions from client:**
+```javascript
+// your server.js
+import { createMiddlewareByServiceList } from 'reservice';
+
+...
+
+// Add this line to declare serviceList and use the express middleware
+app.use(createMiddlewareByServiceList(serviceList));
+```
+
+**The reducer:**
+```javascript
+import { handleServiceActions } from 'reservice';
+
+const myReducer = handleServiceActions({
+  [doSomeThing]: (state, action) => { ... },
+  [anotherServiceCreator]: anotherReducer,
+  ...
+}, defaultState);
+```
+
+**The redux middleware:**
+```javascript
+import { createStore, applyMiddleware } from 'redux';
+import { serviceMiddleware } from 'reservice';
+
+const store = createStore(
+  myReducer,
+  applyMiddleware(serviceMiddleware)
+);
 ```
