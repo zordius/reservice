@@ -40,7 +40,7 @@ You will need these polyfills for older browsers or other environments:
 Usage
 -----
 
-**Code for a service:**
+**A Service**
 ```javascript
 const myService = (req, payload) => {
   // Do any async task you like, return promise or result
@@ -51,7 +51,7 @@ const myService = (req, payload) => {
 }
 ```
 
-**Service action creator:**
+**A Service Action Creator**
 ```javascript
 import { createService } from 'reservice';
 
@@ -69,7 +69,7 @@ expect(doSomeThing('good')).toEqual({
 });
 ```
 
-**Service list:**
+**Define Service List**
 ```javascript
 const serviceList = {
   [doSomeThing]: myService,
@@ -78,7 +78,7 @@ const serviceList = {
 }
 ```
 
-**Handle service actions from client:**
+**Setup Express Application**
 ```javascript
 // your server.js
 import { createMiddlewareByServiceList } from 'reservice';
@@ -89,7 +89,7 @@ import { createMiddlewareByServiceList } from 'reservice';
 app.use(createMiddlewareByServiceList(serviceList));
 ```
 
-**The reducer:**
+**The Reducer**
 ```javascript
 import { handleServiceActions } from 'reservice';
 
@@ -100,7 +100,7 @@ const myReducer = handleServiceActions({
 }, defaultState);
 ```
 
-**The redux middleware:**
+**Setup Redux Store**
 ```javascript
 import { createStore, applyMiddleware } from 'redux';
 import { serviceMiddleware } from 'reservice';
