@@ -15,10 +15,10 @@ A redux service means: an asynchronous task triggered by a start service action.
 Re-service provides a good practice for all your asynchronous tasks, includes:
 * A helper function to create service action creator. (the action is <a href="https://github.com/acdlite/flux-standard-action">FSA</a> compliant)
 * A redux middleware to:
-  1. handle the service action
+  * handle the service action
     * At client side, transport action to server then get result.
     * At server side, execute the service then get result.
-  2. then ispatch service result action
+  * then ispatch service result action
 * A helper function to create reducer to handle service result actions.
 * Helper functions to idenfity an action:
   * is it a valid service action?
