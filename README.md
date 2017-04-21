@@ -1,25 +1,27 @@
 reservice
 =========
-An isomorphic async tasks solution for redux.
+An isomorphic asynchronous tasks solution for redux.
 
 [![Build Status](https://travis-ci.org/zordius/reservice.svg?branch=master)](https://travis-ci.org/zordius/reservice)
 
-You may already using <a href="https://github.com/gaearon/redux-thunk">redux-thunk</a> for your async tasks. Put thunk, function or Promise into action makes the action object is not pure, which means the action may not serialized or replayed well.
+You may already using <a href="https://github.com/gaearon/redux-thunk">redux-thunk</a> for your asynchronous tasks. Put thunk, function or promise into an action makes it not pure, which means the action may not be serialized or replayed well.
 
-A better async task practice is: create your action as pure object, do async tasks in your own middlewares. Then you can see pure and sync codes in all your actions creators and reducers, all async codes are in middlewares. The service actions are pure, so they can be transported from client side to server side, the bonus is: isomorphic!
+A better asynchronous task practice is: create your action as pure object, do asynchronous tasks in your own redux middlewares. This practice keep all your actions creators and reducers pure and clean, the only place you put asynchronous codes are redux middlewares....Or, a better place: service.
 
-Reservice provides a good practice for all your async tasks, includes:
-* A helper function to create service action creator (the action is <a href="https://github.com/acdlite/flux-standard-action">FSA</a> compliant)
+A service means: an asynchronous task triggered by a start service action. After it done, the result will be dispatched as another service done action.
+
+Reservice provides a good practice for all your asynchronous tasks, includes:
+* A helper function to create service action creator. (the action is <a href="https://github.com/acdlite/flux-standard-action">FSA</a> compliant)
 * A redux middleware to:
-  * handle the service action
-    * At client side, transport action to server then get result
-    * At server side, execute the service then get result
+  * handle the service action.
+    * At client side, transport action to server then get result.
+    * At server side, execute the service then get result.
   * dispatch service result action
-* A helper function to create reducer to handle service result action
+* A helper function to create reducer to handle service result actions.
 * Helper functions to idenfity a action:
-  * is it valid?
-  * is it ended?
-  * is it success?
+  * is it a valid service action?
+  * is it an ended service action?
+  * is it a success service action?
 * An <a href="https://www.npmjs.com/package/express">express</a> middleware to deal with transported service actions.
 
 Install
