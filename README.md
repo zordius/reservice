@@ -43,9 +43,9 @@ Usage
 **A Service**
 ```javascript
 const myService = (req, payload) => {
-  // Do any async task you like, return promise or result
+  // Do any async task you like, return a promise or result.
   // You can not know any redux related things,
-  // But you can access the express request object here.
+  // but you can access the express request object here.
   ...
   return result;
 }
