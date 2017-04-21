@@ -63,6 +63,7 @@ expect(doSomeThing('good')).toEqual({
     serviceState: 'CREATED',
   },
 });
+```
 
 **Service list:**
 ```javascript
