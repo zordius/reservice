@@ -42,6 +42,6 @@
   "dependencies": {
     "debug": "^2.6.3",
     "redux-actions": "^2.0.2",
-    "yfetch": "0.0.1"
+    "yfetch": "^0.0.2"
   }
 }
