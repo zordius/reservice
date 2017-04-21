@@ -6,7 +6,7 @@ An isomorphic/universal asynchronous tasks solution for redux.
 
 You may already using <a href="https://github.com/gaearon/redux-thunk">redux-thunk</a> for your asynchronous tasks. Put thunk, function or promise into an action makes it not pure, which means the action may not be serialized or replayed well.
 
-A better asynchronous task practice is: create your action as pure object, do asynchronous tasks in your own redux middlewares. This practice keep all your actions creators and reducers pure and clean, make your application more isomorphic or universal. The only place you put asynchronous codes are redux middlewares....Or, a better place: redux service (re-service).
+A better asynchronous task practice is: create your action as pure object, do asynchronous tasks in your own redux middlewares. This practice keep all your actions creators and reducers pure and clean, make your application more isomorphic or universal. The only place you put asynchronous codes are redux middlewares....Or, a better place: redux service (a.k.a. re-service).
 
 A redux service means: an asynchronous task triggered by a start service action. After it done, the result will be dispatched as another service done action.
 
