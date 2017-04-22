@@ -82,8 +82,12 @@ const serviceList = {
 ```javascript
 // your server.js
 import { createMiddlewareByServiceList } from 'reservice';
+import bodyParser from 'body-parser';
 
 ...
+
+// reservice middleware need to access body as json
+app.use(bodyParser.json());
 
 // Add this line to declare serviceList and use the express middleware
 app.use(createMiddlewareByServiceList(serviceList));
