@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
+import { yelpSearch } from '../actions/yelp';
+
 import YelpSearchList from '../components/YelpSearchList';
 import YelpBusiness from '../components/YelpBusiness';
 import YelpSearch from '../components/YelpSearch';
@@ -21,17 +23,24 @@ const mapStateToProps = state => ({
   Main: routeMain(state.routing.route.name),
   yelp: state.yelp,
   query: state.routing.route.query,
+  loading: state.pageStatus.isLoading,
 });
 
-const MainComponent = ({ Main, yelp, query }) => <div>
-  <YelpSearch query={query} />
-  <Main yelp={yelp} />
+const mapDispatchToProps = dispatch => ({
+  onSubmit: term => dispatch(yelpSearch({ term })),
+});
+
+const MainComponent = ({ Main, yelp, query, loading, onSubmit }) => <div>
+  <YelpSearch query={query} onSubmit={onSubmit} />
+  {loading ? <div className="loading">Now loading...</div> : <Main yelp={yelp} />}
 </div>;
 
 MainComponent.propTypes = {
   Main: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
   query: PropTypes.object.isRequired,
   yelp: PropTypes.object.isRequired,
+  loading: PropTypes.bool.isRequired,
 };
 
-export default connect(mapStateToProps)(MainComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(MainComponent);
