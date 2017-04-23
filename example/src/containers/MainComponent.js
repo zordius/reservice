@@ -11,9 +11,15 @@ import YelpSearch from '../components/YelpSearch';
 const routeMain = (name) => {
   switch (name) {
     case 'search':
-      return YelpSearchList;
+      return ({ yelp, query, onSubmit }) => (<div>
+        <YelpSearch query={query} onSubmit={onSubmit} />
+        <YelpSearchList yelp={yelp} />
+      </div>);
     case 'business':
-      return YelpBusiness;
+      return ({ yelp }) => (<div>
+        <a className="home" href="/">Back to Home</a>
+        <YelpBusiness yelp={yelp} />
+      </div>);
     default:
       return () => <div>Route not found</div>;
   }
@@ -31,8 +37,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const MainComponent = ({ Main, yelp, query, loading, onSubmit }) => <div>
-  <YelpSearch query={query} onSubmit={onSubmit} />
-  {loading ? <div className="loading">Now loading...</div> : <Main yelp={yelp} />}
+  {loading ? <div className="loading">Now loading...</div> : <Main yelp={yelp} query={query} onSubmit={onSubmit} />}
 </div>;
 
 MainComponent.propTypes = {
