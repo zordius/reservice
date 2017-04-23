@@ -42,7 +42,8 @@ Usage
 
 **A Service**
 ```javascript
-const myService = (req, payload) => {
+// req is optional, you can receive req to deal with session based tasks.
+const myService = (payload, req) => {
   // Do any async task you like, return a promise or result.
   // You can not know any redux related things,
   // but you can access the express request object here.
