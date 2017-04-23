@@ -1,6 +1,6 @@
 import Router from 'routr';
 
-const router = new Router({
+const routing = new Router({
   search: {
     path: '/',
   },
@@ -9,4 +9,4 @@ const router = new Router({
   },
 });
 
-export default router;
+export default routing;

@@ -26,7 +26,7 @@ import { initStore } from './reduxapp';
 import { setReq } from './actions/routing';
 import services from './services/index';
 import renderFullHtml from './lib/renderFullHtml';
-import router from './router';
+import routing from './routing';
 
 const app = express();
 
@@ -38,7 +38,7 @@ app.use(createMiddlewareByServiceList(services));
 
 // set up middleware for redux app
 app.use((req, res, next) => {
-  const route = router.getRoute(req.url, { method: req.method });
+  const route = routing.getRoute(req.url, { method: req.method });
 
   if (!route) {
     return next();
