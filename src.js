@@ -96,7 +96,7 @@ const isSuccess = action => (isEnd(action) && !action.error);
 const handleServiceResult =
 (store, next, action) => result => store.dispatch(resultAction(action, result));
 
-const executeServiceAtServer = (request, action) => {
+const executeServiceAtServer = (action, request) => {
   // service definition check
   const serviceName = action.meta.serviceName;
   const service = SERVICE_LIST[serviceName];
@@ -107,7 +107,7 @@ const executeServiceAtServer = (request, action) => {
 
   try {
     action.meta.serviceState = STATE_BEGIN;
-    return Promise.resolve(service(request, action.payload));
+    return Promise.resolve(service(action.payload, request));
   } catch (E) {
     return Promise.reject(E);
   }
@@ -128,7 +128,7 @@ export const setupServiceEndpoint = (url, method = DEFAULT_TRANSPORT_METHOD) => 
   SERVICE_TRANSPORT_METHOD = method;
 };
 
-// A redux middleware creator, the first parameter is the serviceList
+// A redux middleware
 export const serviceMiddleware = store => next => (action) => {
   const srv = isService(action, true);
 
@@ -157,10 +157,12 @@ export const serviceMiddleware = store => next => (action) => {
     if (!global.window) {
       throw new ReserviceError('Wrong serviceMiddleware() at server side! You should create service middleware by serviceMiddleware(serviceList) !');
     }
-    job = transportServiceToServer(action, store.req);
+    job = transportServiceToServer(action);
   } else {
-    // store.req is a special design to make service work
-    job = executeServiceAtServer(store.req, action);
+    // store.req is a special design to let service access req
+    // to deal request based logic.
+    // (cookie, session, headers, other express middlewares)
+    job = executeServiceAtServer(action, store.req);
   }
 
   const handle = handleServiceResult(store, next, action);
@@ -239,7 +241,7 @@ export const createMiddlewareByServiceList = (serviceList) => {
     debugReceive('name: %s - payload: %o', action.meta.serviceName, action.payload);
 
     // no matter success or failed, response result to client.
-    return executeServiceAtServer(req, action)
+    return executeServiceAtServer(action, req)
     .then(responseServiceResult(res), responseServiceResult(res));
   };
 };
