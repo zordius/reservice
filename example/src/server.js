@@ -36,7 +36,7 @@ app.use(bodyParser.json());
 // adopt reservice here
 app.use(createMiddlewareByServiceList(services));
 
-// set up middleware for redux app
+// Set up middleware for redux app to do server side rendering.
 app.use((req, res, next) => {
   const route = routing.getRoute(req.url, { method: req.method });
 
