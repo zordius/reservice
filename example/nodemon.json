@@ -1,0 +1,11 @@
+{
+  "verbose": true,
+  "exec": "babel-node src/development.js",
+  "watch": [
+    ".babelrc",
+    "src/server.js",
+    "src/development.js",
+    "src/services",
+    "webpack.config.js"
+  ]
+}

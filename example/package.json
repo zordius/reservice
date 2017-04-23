@@ -1,0 +1,57 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "An example project for yfetch and reservice",
+  "main": "dist/production.js",
+  "scripts": {
+    "lint": "eslint src spec --ext js,jsx",
+    "start": "NODE_ENV=development nodemon",
+    "test": "NODE_ENV=test nyc jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zordius/reservice.git"
+  },
+  "keywords": [
+    "redux"
+  ],
+  "author": "zordius@yahoo-inc.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zordius/reservice/issues"
+  },
+  "homepage": "https://github.com/zordius/reservice#readme",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "debug": "^2.6.4",
+    "express": "^4.15.2",
+    "isomorphic-fetch": "^2.2.1",
+    "prop-types": "^15.5.8",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "react-redux": "^5.0.4",
+    "redux": "^3.6.0",
+    "redux-actions": "^2.0.2",
+    "reservice": "0.0.1",
+    "routr": "^2.1.0",
+    "serialize-javascript": "^1.3.0",
+    "yelp": "^1.0.2",
+    "yfetch": "0.0.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-loader": "7.0.0-beta.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "eslint": "^3.19.0",
+    "jasmine": "^2.5.3",
+    "jasmine-test-helpers": "^1.2.0",
+    "nock": "^9.0.13",
+    "nodemon": "^1.11.0",
+    "nyc": "^10.2.0",
+    "redux-logger": "^3.0.1",
+    "webpack": "^2.4.1",
+    "webpack-dev-middleware": "^1.10.1",
+    "webpack-hot-middleware": "^2.18.0"
+  }
+}
