@@ -45,8 +45,9 @@ app.use((req, res, next) => {
   }
 
   const store = initStore();
+  store.dispatch(setReq({ ...req, route }));
 
-  return store.dispatch(setReq({ ...req, route }))
+  return route.config.handler(store, route)
   .then(() => res.send(renderFullHtml(store)), err => next(err));
 });
 
