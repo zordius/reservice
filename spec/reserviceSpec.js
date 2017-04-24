@@ -435,6 +435,16 @@ describe('reservice', () => {
       expect(reducer).toHaveBeenCalledWith(3, doneService('foo'));
     });
 
+    it('should bypass when service begin and no .begin', () => {
+      expect(handleServiceActions({ FOO: 'bar' })(3, createService('FOO')(135))).toEqual(3);
+    });
+
+    it('should execute .begin when service begin', () => {
+      const reducer = jasmine.createSpy('reducer');
+      handleServiceActions({ foo: { begin: reducer } })(3, createService('foo')(246));
+      expect(reducer).toHaveBeenCalledWith(3, createService('foo')(246));
+    });
+
     it('should execute .next when success', () => {
       const reducer = jasmine.createSpy('reducer');
       handleServiceActions({ foo: { next: reducer } })(3, doneService('foo'));

@@ -175,7 +175,7 @@ export const handleServiceActions =
 (serviceReducers = {}, defaultState = {}) => (state = defaultState, action) => {
   const srv = isService(action, true);
 
-  if (!srv || srv.error || !isEnd(action)) {
+  if (!srv || srv.error) {
     return state;
   }
 
@@ -183,6 +183,15 @@ export const handleServiceActions =
   if (!reducer) {
     return state;
   }
+
+  if (!isEnd(action)) {
+    if (reducer.begin) {
+      return reducer.begin(state, action);
+    } else {
+      return state;
+    }
+  }
+
 
   if (!isSuccess(action) && reducer.throw) {
     return reducer.throw(state, action);
