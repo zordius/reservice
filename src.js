@@ -187,9 +187,8 @@ export const handleServiceActions =
   if (!isEnd(action)) {
     if (reducer.begin) {
       return reducer.begin(state, action);
-    } else {
-      return state;
     }
+    return state;
   }
 
 
