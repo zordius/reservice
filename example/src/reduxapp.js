@@ -8,7 +8,7 @@ import reducer from './reducers/index';
 import middlewares from './middlewares/index';
 import Main from './containers/MainComponent';
 
-// Initialize the
+// create the redux store with or without initial state
 export const initStore = initState => (initState ? createStore(
   reducer,
   initState,
