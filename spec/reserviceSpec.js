@@ -291,15 +291,19 @@ describe('reservice', () => {
         method: 'POST',
         body: {
           type: 'CALL_SERVICE',
+          payload: { good: 'morning' },
           meta: {
-            serviceName: 'foo',
+            serviceName: 'bar',
             serviceState: 'CREATED',
           },
         },
       };
       middleware(req, {
         send: (act) => {
-          expect(act).toEqual(req);
+          expect(act).toEqual({ 
+            p1: { good: 'morning' },
+            p2: req,
+          });
           done();
         },
       });
@@ -390,16 +394,17 @@ describe('reservice', () => {
 
     it('should executeServiceAtServer()', () => {
       const store = mockStore();
-      return serviceMiddleware(store)(() => 0)(createService('foo')()).then(() => {
+      return serviceMiddleware(store)(() => 0)(createService('foo')(456)).then(() => {
         expect(store.dispatch).toHaveBeenCalledWith({
           type: 'CALL_SERVICE',
-          payload: 123,
+          payload: 456,
           error: false,
           meta: {
             serviceName: 'foo',
             serviceState: 'END',
             previous_action: {
               type: 'CALL_SERVICE',
+              payload: 456,
               meta: {
                 serviceName: 'foo',
                 serviceState: 'BEGIN',
