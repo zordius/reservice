@@ -300,7 +300,7 @@ describe('reservice', () => {
       };
       middleware(req, {
         send: (act) => {
-          expect(act).toEqual({ 
+          expect(act).toEqual({
             p1: { good: 'morning' },
             p2: req,
           });
