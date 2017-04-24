@@ -1,4 +1,5 @@
 import Router from 'routr';
+import { setTitle } from './actions/metaHeader';
 import { yelpSearch, yelpBusiness } from './actions/yelp';
 
 const routing = new Router({
@@ -8,7 +9,7 @@ const routing = new Router({
   },
   business: {
     path: '/business/:id',
-    handler: (store, route) => store.dispatch(yelpBusiness(route.params.id)),
+    handler: (store, route) => store.dispatch(yelpBusiness(route.params.id)).then(action => store.dispatch(setTitle(action.payload.name))),
   },
 });
 
