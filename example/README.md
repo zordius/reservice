@@ -49,8 +49,10 @@ How it works - services
 
 * You can see service functions in <a href="src/services/yelp.js">services/yelp.js</a>. All your services will be placed and executed at server side only, so you can access secrets here safely.
 
+* All services should be defined in <a href="src/services/index.js">services/index.js</a> as `{ serviceName: serviceFunction }` Object.
+
 * An express middleware be setup in <a href="src/server.js#L33-L37">server.js</a>, all service requests from client side are handled here.
 
-* A redux middleware be setup in 
+* A redux middleware be setup in <a href="src/middlewares/index.js#L6">middlewares/index.js</a>.
 
 * You can see an example of dispatching service action at client side in <a href="src/containers/MainComponent.js#L35-L37">MainComponent.js</a>. When user submit search, we prevent default behavior then just <a href="src/components/YelpSearch.js#L17-L20">searching at client side</a>.
