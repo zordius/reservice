@@ -45,7 +45,7 @@ How it works - the isomorphic app
 How it works - services
 -----------------------
 
-* <a href="src/actions/yelp.js">actions/yelp.js</a> is an example for creating action creators for services. Check <a href="spec/actions/yelpSpec.js">yelpSpec</a> to know the format of these service actions. These actions are pure, so you can create and dispatch these actions any where.
+* <a href="src/actions/yelp.js">actions/yelp.js</a> is an example for creating action creators for services. Check <a href="spec/actions/yelpSpec.js">yelpSpec</a> to know the format of these service actions. These actions are pure, so you can create and dispatch these actions at both server side or client side.
 
 * You can see service functions in <a href="src/services/yelp.js">services/yelp.js</a>. All your services will be placed and executed at server side only, so you can access secrets here safely.
 
@@ -53,6 +53,6 @@ How it works - services
 
 * An express middleware be setup in <a href="src/server.js#L33-L37">server.js</a>, all service requests from client side are handled here.
 
-* A redux middleware be setup in <a href="src/middlewares/index.js#L6">middlewares/index.js</a>.
+* A redux middleware be setup in <a href="src/middlewares/index.js#L6">middlewares/index.js</a> to handle service actions and execute the services.
 
-* You can see an example of dispatching service action at client side in <a href="src/containers/MainComponent.js#L35-L37">MainComponent.js</a>. When user submit search, we prevent default behavior then just <a href="src/components/YelpSearch.js#L17-L20">searching at client side</a>.
+* You can see an example of dispatching service action at client side in <a href="src/containers/MainComponent.js#L35-L37">MainComponent.js</a>. When user submit search, we prevent default behavior then just <a href="src/components/YelpSearch.js#L17-L20">do search at client side</a>.
