@@ -51,4 +51,6 @@ How it works - services
 
 * An express middleware be setup in <a href="src/server.js#L33-L37">server.js</a>, all service requests from client side are handled here.
 
+* A redux middleware be setup in 
+
 * You can see an example of dispatching service action at client side in <a href="src/containers/MainComponent.js#L35-L37">MainComponent.js</a>. When user submit search, we prevent default behavior then just <a href="src/components/YelpSearch.js#L17-L20">searching at client side</a>.

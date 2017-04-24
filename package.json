@@ -2,10 +2,10 @@
   "name": "reservice",
   "version": "0.0.1",
   "description": "An isomorphic async tasks solution for redux",
-  "main": "index.js",
+  "main": "dist.js",
   "scripts": {
     "lint": "eslint src.js spec",
-    "build": "NODE_ENV=build babel src.js -o index.js",
+    "build": "NODE_ENV=build babel src.js -o dist.js",
     "test": "NODE_ENV=test nyc jasmine"
   },
   "repository": {

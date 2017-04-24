@@ -1,4 +1,4 @@
 .nyc_output/
 node_modules/
 coverage/
-index.js
+dist.js
