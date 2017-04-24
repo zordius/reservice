@@ -119,3 +119,8 @@ const store = createStore(
 // Required at server side.
 store.req = req;
 ```
+
+Example
+-------
+
+Please check <a href="example">example</a> to get a deeper guide.

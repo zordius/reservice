@@ -28,10 +28,10 @@ How it works - the isomorphic app
 ---------------------------------
 
 **Isomorphic Application**
-* <a href="src/reduxapp.js">reduxapp.js#L11-L23</a> defines the redux store and MainComponent for both server side and client side rendering.
+* <a href="src/reduxapp.js#L11-L23">reduxapp.js</a> defines the redux store and MainComponent for both server side and client side rendering.
 
 **Routing Rules**
-* <a href="src/routing.js">routing.js</a> defines the routing rules. The `handler` function in each route describes "How to prepare data for this page?", you can see some service actions are dispatched here.
+* <a href="src/routing.js">routing.js</a> defines the routing rules. The `handler` function in each route describes "How to prepare data for this page?", you can see some <a href="src/routing.js#L12">service actions are dispatched</a> here.
 
 **Routing Action**
 * <a href="src/server.js">server.js</a> creates the express application. There is <a href="src/server.js#L39-L52">an express middleware</a> deal with routing, dispatch the request and routing information to redux store, execute routed handler, then rendering at server side.
