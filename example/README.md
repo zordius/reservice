@@ -24,14 +24,14 @@ npm start
 ```
 Then browse http://localhost:3000/
 
-How it works
-------------
+How it works - the isomorphic app
+---------------------------------
 
 **Isomorphic Application**
 * <a href="src/reduxapp.js">reduxapp.js#L11-L23</a> defines the redux store and MainComponent for both server side and client side rendering.
 
 **Routing Rules**
-* <a href="src/routing.js">routing.js</a> defines the routing rules.
+* <a href="src/routing.js">routing.js</a> defines the routing rules. The `handler` function in each route describes "How to prepare data for this page?", you can see some service actions are dispatched here.
 
 **Routing Action**
 * <a href="src/server.js">server.js</a> creates the express application. There is <a href="src/server.js#L39-L52">an express middleware</a> deal with routing, dispatch the request and routing information to redux store, execute routed handler, then rendering at server side.
@@ -41,3 +41,14 @@ How it works
 
 **Client Side Rendering**
 * <a href="src/reduxapp.js#L29-L31">reduxapp.js</a> is the entry point of client side script, too. It take `REDUXDATA` as initial state, create the store, then render the MainComponent into main div.
+
+How it works - services
+-----------------------
+
+* <a href="src/actions/yelp.js">actions/yelp.js</a> is an example for creating action creators for services. Check <a href="spec/actions/yelpSpec.js">yelpSpec</a> to know the format of these service actions. These actions are pure, so you can create and dispatch these actions any where.
+
+* You can see service functions in <a href="src/services/yelp.js">services/yelp.js</a>. All your services will be placed and executed at server side only, so you can access secrets here safely.
+
+* An express middleware be setup in <a href="src/server.js#L33-L37">server.js</a>, all service requests from client side are handled here.
+
+* You can see an example of dispatching service action at client side in <a href="src/containers/MainComponent.js#L35-L37">MainComponent.js</a>. When user submit search, we prevent default behavior then just <a href="src/components/YelpSearch.js#L17-L20">searching at client side</a>.
