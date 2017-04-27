@@ -95,10 +95,10 @@ app.use(createMiddlewareByServiceList(serviceList));
 ```
 
 **The Reducer**
-By default, only handle ended service action:
 ```javascript
 import { handleServiceActions } from 'reservice';
 
+// create a reducer only deal with ended service action by default
 const myReducer = handleServiceActions({
   [doSomeThing]: (state, action) => { ... },
   [anotherServiceCreator]: anotherReducer,
@@ -118,6 +118,33 @@ const myReducer = handleServiceActions({
   [anotherServiceCreator]: anotherReducer,
   ...
 }, defaultState);
+```
+You can also mix normal reducers and service reducer:
+```javascript
+import { handleServiceActions } from 'reservice';
+
+const defaultState = {
+  isLoading: false,
+  apiresult: {},
+}
+
+const serviceReducer = handleServiceActions({
+  [callApi]: {
+    begin: (state, action) => { ...state, isLoading: true },
+    next: (state, action) => { ...state, isLoading: true, apiresult: action.payload },
+  }
+}, defaultState);
+
+export reducer = (state = defaultState, action) => {
+  switch (action.type) {
+  case 'START_LOADING':
+    return {...state, isLoading: true}
+  case 'STOP_LOADING':
+    return {...state, isLoading: false}
+  default:
+    return serviceReducer(state, action);
+  }
+}
 ```
 
 **Setup Redux Store**
