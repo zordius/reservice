@@ -95,11 +95,26 @@ app.use(createMiddlewareByServiceList(serviceList));
 ```
 
 **The Reducer**
+By default, only handle ended service action:
 ```javascript
 import { handleServiceActions } from 'reservice';
 
 const myReducer = handleServiceActions({
   [doSomeThing]: (state, action) => { ... },
+  [anotherServiceCreator]: anotherReducer,
+  ...
+}, defaultState);
+```
+
+If you also want to handle different service action status:
+```javascript
+import { handleServiceActions } from 'reservice';
+
+const myReducer = handleServiceActions({
+  [doSomeThing]: {
+    begin: (state, action) => { ... },  // executes when started
+    next: (state, action) => { ... },   // executes when end and success
+    throw: (state, action) => { ... },  // executes when end and failed
   [anotherServiceCreator]: anotherReducer,
   ...
 }, defaultState);
