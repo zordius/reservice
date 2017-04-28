@@ -17,38 +17,39 @@
 //   please add client side polyfill to pagePolyfills in webpack.config.js
 
 // Adopt fetch polyfill
-import 'isomorphic-fetch';
+import 'isomorphic-fetch'
 
-import express from 'express';
-import bodyParser from 'body-parser';
-import { createMiddlewareByServiceList } from 'reservice';
-import { initStore } from './reduxapp';
-import { setReq } from './actions/routing';
-import services from './services/index';
-import renderFullHtml from './lib/renderFullHtml';
-import routing from './routing';
+import express from 'express'
+import bodyParser from 'body-parser'
+import { createMiddlewareByServiceList, settleRequest } from 'reservice'
+import { initStore } from './reduxapp'
+import { setRoute } from './actions/routing'
+import services from './services/index'
+import renderFullHtml from './lib/renderFullHtml'
+import routing from './routing'
 
-const app = express();
+const app = express()
 
 // reservice need to access body as json
-app.use(bodyParser.json());
+app.use(bodyParser.json())
 
 // adopt reservice here
-app.use(createMiddlewareByServiceList(services));
+app.use(createMiddlewareByServiceList(services))
 
 // Set up middleware for redux app to do server side rendering.
 app.use((req, res, next) => {
-  const route = routing.getRoute(req.url, { method: req.method });
+  const route = routing.getRoute(req.url, { method: req.method })
 
   if (!route) {
-    return next();
+    return next()
   }
 
-  const store = initStore();
-  store.dispatch(setReq({ ...req, route }));
+  const store = initStore()
+  store.dispatch(settleRequest(req))
+  store.dispatch(setRoute(route))
 
   return route.config.handler(store, route)
-  .then(() => res.send(renderFullHtml(store)), err => next(err));
-});
+  .then(() => res.send(renderFullHtml(store)), err => next(err))
+})
 
-export default app;
+export default app

@@ -1,15 +1,15 @@
-import { handleActions } from 'redux-actions';
+import { handleActions } from 'redux-actions'
 
-import { setReq } from '../actions/routing';
+import { setRoute } from '../actions/routing'
 
 const defaultState = {
   route: {
     name: 'default',
     config: {},
-    query: {},
-  },
-};
+    query: {}
+  }
+}
 
 export default handleActions({
-  [setReq]: (state, action) => ({ ...state, route: action.payload.route }),
-}, defaultState);
+  [setRoute]: (state, action) => ({ ...state, route: action.payload })
+}, defaultState)

@@ -9,8 +9,8 @@
 //   please add development related logic in src/dev.js
 // * You CAN NOT using babel-register here,
 //   it is for development only.
-import app from './server';
+import app from './server'
 
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 80
 
-app.listen(port);
+app.listen(port)

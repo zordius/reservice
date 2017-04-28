@@ -1,7 +1,7 @@
-import Yelp from 'yelp';
-import yelpTokenSecret from '../../yelp.cfg.json';
+import Yelp from 'yelp'
+import yelpTokenSecret from '../../yelp.cfg.json'
 
-const yelp = new Yelp(yelpTokenSecret);
+const yelp = new Yelp(yelpTokenSecret)
 
 // A good practice is reduce api results before you return it,
 // then the response size of client side service execution will be smaller.
@@ -13,7 +13,7 @@ const services = {
         rating_img_url: B.rating_img_url,
         id: B.id,
         name: B.name,
-        image_url: B.image_url,
+        image_url: B.image_url
       }))
       : []
     ))
@@ -24,8 +24,8 @@ const services = {
     rating_img_url_small: B.rating_img_url_small,
     url: B.url,
     phone: B.phone,
-    image_url: B.image_url,
-  })),
-};
+    image_url: B.image_url
+  }))
+}
 
-export default services;
+export default services

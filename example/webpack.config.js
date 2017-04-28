@@ -1,14 +1,14 @@
-import webpack from 'webpack';
-import fs from 'fs';
+import webpack from 'webpack'
+import fs from 'fs'
 
-const pageSrcPath = __dirname + '/src/';
-const pagePolyfills = [];
-const pageExtendModules = ['webpack-hot-middleware/client'];
-const publicPath = '/statics/bundle';
+const pageSrcPath = __dirname + '/src/'
+const pagePolyfills = []
+const pageExtendModules = ['webpack-hot-middleware/client']
+const publicPath = '/statics/bundle'
 
 module.exports = {
   entry: {
-    reduxapp: [...pagePolyfills, pageSrcPath + 'reduxapp.js', ...pageExtendModules],
+    reduxapp: [...pagePolyfills, pageSrcPath + 'reduxapp.js', ...pageExtendModules]
   },
   output: {
     filename: '[name].js',
@@ -22,10 +22,10 @@ module.exports = {
         exclude: /(node_modules)/,
         use: [
           {
-            loader: 'babel-loader',
-          },
-        ],
-      },
+            loader: 'babel-loader'
+          }
+        ]
+      }
     ]
   },
   node: {
@@ -37,7 +37,7 @@ module.exports = {
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.EnvironmentPlugin({
-      NODE_ENV: 'development',
-    }),
-  ],
-};
+      NODE_ENV: 'development'
+    })
+  ]
+}

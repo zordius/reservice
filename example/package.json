@@ -4,7 +4,7 @@
   "description": "An example project for yfetch and reservice",
   "main": "dist/production.js",
   "scripts": {
-    "lint": "eslint src spec --ext js,jsx",
+    "lint": "standard --env jasmine",
     "start": "NODE_ENV=development nodemon",
     "test": "NODE_ENV=test nyc jasmine"
   },
@@ -50,6 +50,7 @@
     "nodemon": "^1.11.0",
     "nyc": "^10.2.0",
     "redux-logger": "^3.0.1",
+    "standard": "^10.0.2",
     "webpack": "^2.4.1",
     "webpack-dev-middleware": "^1.10.1",
     "webpack-hot-middleware": "^2.18.0"
