@@ -8,11 +8,7 @@ const middlewares = [
 
 // You can adopt middlewares for development
 if (process.env.NODE_ENV === 'development') {
-  /* eslint-disable import/no-extraneous-dependencies */
-  /* eslint-disable global-require */
-  if (global.window) {
-    middlewares.push(require('redux-logger').default)
-  } else {
+  if (!global.window) {
     middlewares.push(debugLogger)
   }
 }
