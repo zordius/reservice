@@ -6,6 +6,7 @@ export const ACTION_CALL_SERVICE = 'CALL_SERVICE';
 export const STATE_CREATED = 'CREATED';
 export const STATE_BEGIN = 'BEGIN';
 export const STATE_END = 'END';
+export const ACTION_SET_REQUEST = 'SERVICE_SET_REQUEST';
 
 const DEFAULT_TRANSPORT_PATH = '/_reservice_/';
 const DEFAULT_TRANSPORT_METHOD = 'PUT';
@@ -128,8 +129,19 @@ export const setupServiceEndpoint = (url, method = DEFAULT_TRANSPORT_METHOD) => 
   SERVICE_TRANSPORT_METHOD = method;
 };
 
+export const settleRequest = req => ({
+  type: ACTION_SET_REQUEST,
+  payload: req,
+});
+
 // A redux middleware
 export const serviceMiddleware = store => next => (action) => {
+  if (action.type === ACTION_SET_REQUEST) {
+    if (store.req) {
+      throw new ReserviceError('Try to dispatch settleRequest(req) twice!');
+    }
+    store.req = action.payload;
+  }
   const srv = isService(action, true);
 
   if (!srv) {
@@ -159,10 +171,7 @@ export const serviceMiddleware = store => next => (action) => {
     }
     job = transportServiceToServer(action);
   } else {
-    // store.req is a special design to let service access req
-    // to deal request based logic.
-    // (cookie, session, headers, other express middlewares)
-    job = executeServiceAtServer(action, store.req);
+    job = executeServiceAtServer(action, store.req || new ReserviceError('Access request without dispatching settleRequest(req) action!'));
   }
 
   const handle = handleServiceResult(store, next, action);

@@ -3,7 +3,7 @@ import * as reservice from '../src';
 
 const { ReserviceError, createService, isBadService,
         isService, setupServiceEndpoint, createMiddlewareByServiceList,
-        serviceMiddleware, handleServiceActions } = reservice;
+        serviceMiddleware, handleServiceActions, settleRequest } = reservice;
 
 describe('reservice', () => {
   const mockServerHOST = 'http://test';
@@ -17,7 +17,6 @@ describe('reservice', () => {
   };
 
   const mockStore = () => ({
-    req: 123,
     dispatch: jasmine.createSpy('dispatch'),
   });
 
@@ -392,6 +391,14 @@ describe('reservice', () => {
       expect(serviceMiddleware()(() => ({ foo: 'bar' }))(doneService('test'))).toEqual({ foo: 'bar' });
     });
 
+    it('should throw when settleRequest() twice', () => {
+      const act = settleRequest(123);
+      const store = {};
+
+      serviceMiddleware(store)(() => 0)(act);
+      expect(() => serviceMiddleware(store)(() => 0)(act)).toThrow(new ReserviceError('Try to dispatch settleRequest(req) twice!'));
+    });
+
     it('should executeServiceAtServer()', () => {
       const store = mockStore();
       return serviceMiddleware(store)(() => 0)(createService('foo')(456)).then(() => {
@@ -407,6 +414,32 @@ describe('reservice', () => {
               payload: 456,
               meta: {
                 serviceName: 'foo',
+                serviceState: 'BEGIN',
+              },
+            },
+          },
+        });
+      });
+    });
+
+    it('should send Error as req when req is not dispatched', () => {
+      const store = mockStore();
+      return serviceMiddleware(store)(() => 0)(createService('bar')(456)).then(() => {
+        expect(store.dispatch).toHaveBeenCalledWith({
+          type: 'CALL_SERVICE',
+          payload: {
+            p1: 456,
+            p2: new Error('Access request without dispatching settleRequest(req) action!'),
+          },
+          error: false,
+          meta: {
+            serviceName: 'bar',
+            serviceState: 'END',
+            previous_action: {
+              type: 'CALL_SERVICE',
+              payload: 456,
+              meta: {
+                serviceName: 'bar',
                 serviceState: 'BEGIN',
               },
             },
