@@ -1,7 +1,7 @@
 import webpack from 'webpack'
-import fs from 'fs'
+import path from 'path'
 
-const pageSrcPath = __dirname + '/src/'
+const pageSrcPath = path.join(__dirname, '/src/')
 const pagePolyfills = []
 const pageExtendModules = ['webpack-hot-middleware/client']
 const publicPath = '/statics/bundle'
@@ -12,7 +12,7 @@ module.exports = {
   },
   output: {
     filename: '[name].js',
-    path: __dirname + publicPath,
+    path: path.join(__dirname, publicPath),
     publicPath: publicPath + '/'
   },
   module: {

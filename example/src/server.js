@@ -22,7 +22,7 @@ import 'isomorphic-fetch'
 import express from 'express'
 import bodyParser from 'body-parser'
 import { createMiddlewareByServiceList, settleRequest } from 'reservice'
-import { initStore } from './reduxapp'
+import { configureStore } from './reduxapp'
 import { setRoute } from './actions/routing'
 import services from './services/index'
 import renderFullHtml from './lib/renderFullHtml'
@@ -44,7 +44,7 @@ app.use((req, res, next) => {
     return next()
   }
 
-  const store = initStore()
+  const store = configureStore()
   store.dispatch(settleRequest(req))
   store.dispatch(setRoute(route))
 
