@@ -150,16 +150,16 @@ export reducer = (state = defaultState, action) => {
 **Setup Redux Store**
 ```javascript
 import { createStore, applyMiddleware } from 'redux';
-import { serviceMiddleware } from 'reservice';
+import { serviceMiddleware, settleRequest } from 'reservice';
 
 const store = createStore(
   myReducer,
   applyMiddleware(serviceMiddleware)
 );
 
-// IMPORTANT: attach the request object under the store
-// Required at server side.
-store.req = req;
+// Optional: If you like to access request in service
+// You need to do this.
+store.dispatch(settleRequest(req));
 ```
 
 Example
