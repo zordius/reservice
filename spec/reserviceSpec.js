@@ -31,6 +31,12 @@ describe('reservice', () => {
   beforeAll(() => {
     nock(mockServerHOST)
     .persist()
+    .post(mockServerPATH, /err1/)
+    .reply(555, { message: 'err1 message' })
+    .post(mockServerPATH, /err2/)
+    .reply(555, { message: 'err2 message', action: 'foo' })
+    .post(mockServerPATH, /err3/)
+    .reply(555, { message: 'err3 message', stack: 'haha?' })
     .post(mockServerPATH)
     .reply(200, { foo: 'OK' });
   });
@@ -232,6 +238,28 @@ describe('reservice', () => {
               type: 'CALL_SERVICE',
               meta: {
                 serviceName: 'foo',
+                serviceState: 'CREATED',
+              },
+            },
+          },
+        });
+      });
+    });
+
+    it('should receive error from server', () => {
+      const store = mockStore();
+      return serviceMiddleware(store)(() => 0)(createService('err1')()).then(() => {
+        expect(store.dispatch).toHaveBeenCalledWith({
+          type: 'CALL_SERVICE',
+          payload: new Error('err1 message'),
+          error: true,
+          meta: {
+            serviceName: 'err1',
+            serviceState: 'END',
+            previous_action: {
+              type: 'CALL_SERVICE',
+              meta: {
+                serviceName: 'err1',
                 serviceState: 'CREATED',
               },
             },

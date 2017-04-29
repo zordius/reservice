@@ -137,13 +137,14 @@ const convertError = (err) => {
   return E;
 };
 
+
 const transportServiceToServer = action => yfetch({
   json: true,
   method: SERVICE_TRANSPORT_METHOD,
   url: SERVICE_TRANSPORT_PATH,
   body: JSON.stringify(action),
-  error: [404, 500, 555],
-}).then(result => result.body, err => convertError(err));
+}).then(response =>
+  ((response.status === 555) ? convertError(response.body) : response.body));
 
 export const setupServiceEndpoint = (url, method = DEFAULT_TRANSPORT_METHOD) => {
   if (SERVICE_LIST) {
