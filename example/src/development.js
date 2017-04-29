@@ -23,7 +23,15 @@ const pwd = process.cwd()
 
 // webpack-dev-middleware provide bundled entry files on the fly
 app.use(require('webpack-dev-middleware')(compiler, {
-  stats: { colors: true, cached: false, chunks: false },
+  stats: {
+    colors: true,
+    cached: false,
+    hash: false,
+    assets: false,
+    timings: false,
+    chunks: false,
+    version: false
+  },
   publicPath: webpackConfig.output.publicPath
 }))
 
