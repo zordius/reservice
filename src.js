@@ -114,6 +114,17 @@ const executeServiceAtServer = (action, request) => {
   }
 };
 
+const serializeError = (key, value) => (
+  (value instanceof Error)
+  ? Object.getOwnPropertyNames(value).reduce((O, K) => {
+    if ((process.env.NODE_ENV === 'development') || (K !== 'stack')) {
+      O[K] = value[K];
+    }
+    return O;
+  }, {})
+  : value
+);
+
 const transportServiceToServer = action => yfetch({
   json: true,
   method: SERVICE_TRANSPORT_METHOD,
@@ -212,7 +223,8 @@ export const handleServiceActions =
   return reducer(state, action);
 };
 
-const responseServiceResult = res => result => res.send(result);
+const responseServiceResult = res => result => res.send(JSON.stringify(result));
+const responseServiceError = res => err => res.status(555).send(JSON.stringify(err, serializeError));
 
 // create an express middleware to handle service action from client side
 export const createMiddlewareByServiceList = (serviceList) => {
@@ -259,6 +271,6 @@ export const createMiddlewareByServiceList = (serviceList) => {
 
     // no matter success or failed, response result to client.
     return executeServiceAtServer(action, req)
-    .then(responseServiceResult(res), responseServiceResult(res));
+    .then(responseServiceResult(res), responseServiceError(res));
   };
 };

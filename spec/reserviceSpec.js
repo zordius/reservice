@@ -299,10 +299,10 @@ describe('reservice', () => {
       };
       middleware(req, {
         send: (act) => {
-          expect(act).toEqual({
+          expect(act).toEqual(JSON.stringify({
             p1: { good: 'morning' },
             p2: req,
-          });
+          }));
           done();
         },
       });
@@ -321,10 +321,20 @@ describe('reservice', () => {
         },
       };
       middleware(req, {
-        send: (err) => {
-          expect(err).toEqual(new ReserviceError('can not find service named as "not_found" in serviceList'));
+        status: code => ({ send: (err) => {
+          expect(code).toEqual(555);
+          expect(err).toEqual(JSON.stringify({
+            message: 'can not find service named as "not_found" in serviceList',
+            action: {
+              type: 'CALL_SERVICE',
+              meta: {
+                serviceName: 'not_found',
+                serviceState: 'CREATED',
+              },
+            }
+          }));
           done();
-        },
+        } }),
       });
     });
 
@@ -341,10 +351,13 @@ describe('reservice', () => {
         },
       };
       middleware(req, {
-        send: (err) => {
-          expect(err).toEqual(new ReserviceError('bad'));
+        status: code => ({ send: (err) => {
+          expect(code).toEqual(555);
+          expect(err).toEqual(JSON.stringify({
+            message: 'bad',
+          }));
           done();
-        },
+        } }),
       });
     });
   });
