@@ -1,6 +1,6 @@
 {
   "name": "reservice",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An isomorphic async tasks solution for redux",
   "main": "dist.js",
   "scripts": {
