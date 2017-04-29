@@ -267,6 +267,50 @@ describe('reservice', () => {
         });
       });
     });
+
+    it('should receive reservice error from server', () => {
+      const store = mockStore();
+      return serviceMiddleware(store)(() => 0)(createService('err2')()).then(() => {
+        expect(store.dispatch).toHaveBeenCalledWith({
+          type: 'CALL_SERVICE',
+          payload: new ReserviceError('err2 message', { action: 'foo' }),
+          error: true,
+          meta: {
+            serviceName: 'err2',
+            serviceState: 'END',
+            previous_action: {
+              type: 'CALL_SERVICE',
+              meta: {
+                serviceName: 'err2',
+                serviceState: 'CREATED',
+              },
+            },
+          },
+        });
+      });
+    });
+
+    it('should receive stack from server', () => {
+      const store = mockStore();
+      return serviceMiddleware(store)(() => 0)(createService('err3')()).then(() => {
+        expect(store.dispatch).toHaveBeenCalledWith({
+          type: 'CALL_SERVICE',
+          payload: new ReserviceError('err3 message', { action: 'foo' }),
+          error: true,
+          meta: {
+            serviceName: 'err3',
+            serviceState: 'END',
+            previous_action: {
+              type: 'CALL_SERVICE',
+              meta: {
+                serviceName: 'err3',
+                serviceState: 'CREATED',
+              },
+            },
+          },
+        });
+      });
+    });
   });
 
   describe('setupServiceEndpoint() error', () => {
