@@ -331,7 +331,7 @@ describe('reservice', () => {
                 serviceName: 'not_found',
                 serviceState: 'CREATED',
               },
-            }
+            },
           }));
           done();
         } }),

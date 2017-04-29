@@ -125,12 +125,25 @@ const serializeError = (key, value) => (
   : value
 );
 
+const convertError = (err) => {
+  const E = err.action
+    ? new ReserviceError(err.message, err.action)
+    : new Error(err.message);
+
+  if (err.stack) {
+    E.stack = err.stack;
+  }
+
+  return E;
+};
+
 const transportServiceToServer = action => yfetch({
   json: true,
   method: SERVICE_TRANSPORT_METHOD,
   url: SERVICE_TRANSPORT_PATH,
   body: JSON.stringify(action),
-}).then(result => result.body);
+  error: [404, 500, 555],
+}).then(result => result.body, err => convertError(err));
 
 export const setupServiceEndpoint = (url, method = DEFAULT_TRANSPORT_METHOD) => {
   if (SERVICE_LIST) {
@@ -224,7 +237,8 @@ export const handleServiceActions =
 };
 
 const responseServiceResult = res => result => res.send(JSON.stringify(result));
-const responseServiceError = res => err => res.status(555).send(JSON.stringify(err, serializeError));
+const responseServiceError = res =>
+  err => res.status(555).send(JSON.stringify(err, serializeError));
 
 // create an express middleware to handle service action from client side
 export const createMiddlewareByServiceList = (serviceList) => {
