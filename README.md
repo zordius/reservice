@@ -19,11 +19,10 @@ Re-service provides a good practice for all your asynchronous tasks, includes:
     * At client side, transport action to server then get result.
     * At server side, execute the service then get result.
   * then dispatch service result action
-* A helper function to create reducer to handle service result actions.
-* Helper functions to idenfity an action:
-  * is it a valid service action?
-  * is it an ended service action?
-  * is it a success service action?
+* A helper function to create reducer to handle service actions, you may:
+  * reduce the begin service action
+  * reduce the success ended service action
+  * reduce the errored service action
 * An <a href="https://www.npmjs.com/package/express">express</a> middleware to deal with transported service actions.
 
 Install
