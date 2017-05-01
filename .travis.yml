@@ -6,7 +6,10 @@ node_js:
 script:
   - npm run lint
   - npm run test
+  - ./travis.sh
 sudo: false
 cache:
   directories:
     - node_modules
+env:
+  - secure: "6tXe45dg76J1kNd9tqSfz0MQOQ1uPLUfQX12dHTjtGJNmZLScwd5t2uXMqCRSz9zzE+obwkUv506F4N/5O/YGbbd8+KV8BCQoCeReKToiOeW6xRkRy87njy/aC4RzpPXqQF3uSX2BGCgdNT3Anp9jJCDL653cG6Kl8wuUpzWyq4Sc/JzwM/nHTf/jF3/Svu8yit+tnHokIOZ2jFtc22VYpNf+O+5sXJGVCkjhN6Iu0KO2ELvZ8ZH+C9H47j+kmtzGtpg3eGg/gdYRsHwjShHAuz1ywQqWZcMPNjuuUVaVuNW/agQMhpuwZaZsdtjhbX8dM2g9AevEj4C4B5RVCUSCk4CjKFROF6SNP7lUpJOtM5neG1plRHFpAioExEpzwD+pXVcnTBoJThDVRqV2zvA8msondkN3yPreJI36x3KP1/jX2Vc5QYuFeD37HKVb2t7CdmfmZKSkRHhe29G5gUI/slVqYl18Mm6YT4Veoa/Xgc/+D11YssV1ZniFreFGe1uDK79BNEOIDlYIHj6t0PpUhD4ETN8Wio0MelDFFicFc/aOL8VRxzJS5RGiz36Uh/xy5epRVbLljB5+Mb//GM52/xGTguA4SmxML4lSARIG66vc5PynOZtcg0jsvZojnRbmiT5X2UYwbHlArfvqx5TraQWy+htv72MfP7WHZmg4Ok="
