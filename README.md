@@ -2,7 +2,7 @@ reservice
 =========
 An isomorphic/universal asynchronous tasks solution for redux.
 
-[![Build Status](https://travis-ci.org/zordius/reservice.svg?branch=master)](https://travis-ci.org/zordius/reservice) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![npm version](https://img.shields.io/npm/v/reservice.svg)](https://www.npmjs.org/package/reservice) [![Build Status](https://travis-ci.org/zordius/reservice.svg?branch=master)](https://travis-ci.org/zordius/reservice)  [![Test Coverage](https://codeclimate.com/github/zordius/reservice/badges/coverage.svg)](https://codeclimate.com/github/zordius/reservice) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 You may already using <a href="https://github.com/gaearon/redux-thunk">redux-thunk</a> for your asynchronous tasks. Put thunk, function or promise into an action makes it not pure, which means the action may not be serialized or replayed well.
 
