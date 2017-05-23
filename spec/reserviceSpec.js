@@ -12,7 +12,7 @@ describe('reservice', () => {
 
   const doneService = (name) => {
     const act = createService(name)();
-    act.meta.serviceState = 'END';
+    act.reservice.state = 'END';
     return act;
   };
 
@@ -474,7 +474,7 @@ describe('reservice', () => {
     });
 
     it('should return promise when input bad service action', () => {
-      expect(serviceMiddleware()(() => 0)({ type: 'CALL_SERVICE' }).then).toEqual(jasmine.any(Function));
+      expect(serviceMiddleware()(() => 0)({ reservice: 'CALL_SERVICE' }).then).toEqual(jasmine.any(Function));
     });
 
     it('should bypass when action is done', () => {
@@ -500,18 +500,19 @@ describe('reservice', () => {
       const store = mockStore();
       return serviceMiddleware(store)(() => 0)(createService('foo')(456)).then(() => {
         expect(store.dispatch).toHaveBeenCalledWith({
-          type: 'CALL_SERVICE',
+          type: 'foo',
           payload: 456,
           error: false,
-          meta: {
-            serviceName: 'foo',
-            serviceState: 'END',
+          meta: undefined,
+          reservice: {
+            name: 'foo',
+            state: 'END',
             previous_action: {
-              type: 'CALL_SERVICE',
+              type: 'CALL_RESERVICE',
               payload: 456,
-              meta: {
-                serviceName: 'foo',
-                serviceState: 'BEGIN',
+              reservice: {
+                name: 'foo',
+                state: 'BEGIN',
               },
             },
           },
@@ -523,69 +524,27 @@ describe('reservice', () => {
       const store = mockStore();
       return serviceMiddleware(store)(() => 0)(createService('bar')(456)).then(() => {
         expect(store.dispatch).toHaveBeenCalledWith({
-          type: 'CALL_SERVICE',
+          type: 'bar',
           payload: {
             p1: 456,
             p2: new Error('Access request without dispatching settleRequest(req) action!'),
           },
           error: false,
-          meta: {
-            serviceName: 'bar',
-            serviceState: 'END',
+          meta: undefined,
+          reservice: {
+            name: 'bar',
+            state: 'END',
             previous_action: {
-              type: 'CALL_SERVICE',
+              type: 'CALL_RESERVICE',
               payload: 456,
-              meta: {
-                serviceName: 'bar',
-                serviceState: 'BEGIN',
+              reservice: {
+                name: 'bar',
+                state: 'BEGIN',
               },
             },
           },
         });
       });
-    });
-  });
-
-  describe('handleServiceActions()', () => {
-    it('should create default reducer when no input', () => {
-      expect(handleServiceActions()()).toEqual({});
-    });
-
-    it('should create reducer to handle default state', () => {
-      expect(handleServiceActions(undefined, { foo: 'bar' })()).toEqual({ foo: 'bar' });
-    });
-
-    it('should lookup service list then bypass not matched action', () => {
-      expect(handleServiceActions({}, { foo: 'bar' })(undefined, doneService('TEST'))).toEqual({ foo: 'bar' });
-    });
-
-    it('should execute matched reducer', () => {
-      const reducer = jasmine.createSpy('reducer');
-      handleServiceActions({ foo: reducer })(3, doneService('foo'));
-      expect(reducer).toHaveBeenCalledWith(3, doneService('foo'));
-    });
-
-    it('should bypass when service begin and no .begin', () => {
-      expect(handleServiceActions({ FOO: 'bar' })(3, createService('FOO')(135))).toEqual(3);
-    });
-
-    it('should execute .begin when service begin', () => {
-      const reducer = jasmine.createSpy('reducer');
-      handleServiceActions({ foo: { begin: reducer } })(3, createService('foo')(246));
-      expect(reducer).toHaveBeenCalledWith(3, createService('foo')(246));
-    });
-
-    it('should execute .next when success', () => {
-      const reducer = jasmine.createSpy('reducer');
-      handleServiceActions({ foo: { next: reducer } })(3, doneService('foo'));
-      expect(reducer).toHaveBeenCalledWith(3, doneService('foo'));
-    });
-
-    it('should execute .throw when failed', () => {
-      const reducer = jasmine.createSpy('reducer');
-      const failService = { ...doneService('foo'), error: true };
-      handleServiceActions({ foo: { throw: reducer } })(3, failService);
-      expect(reducer).toHaveBeenCalledWith(3, failService);
     });
   });
 });
