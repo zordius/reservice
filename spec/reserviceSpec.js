@@ -70,17 +70,17 @@ describe('reservice', () => {
       expect(createService('SERVICE_NAME').toString()).toBe('SERVICE_NAME');
     });
 
-    it('should keep service name in action.meta.serviceName', () => {
-      expect(createService('SERVICE_NAME')().meta.serviceName).toBe('SERVICE_NAME');
+    it('should keep service name in action.reservice.name', () => {
+      expect(createService('SERVICE_NAME')().reservice.name).toBe('SERVICE_NAME');
     });
 
     it('should provide default payload logic', () => {
       expect(createService('thisIsService')('yo', 'ya')).toEqual({
-        type: 'CALL_SERVICE',
+        type: 'CALL_RESERVICE',
         payload: 'yo',
-        meta: {
-          serviceName: 'thisIsService',
-          serviceState: 'CREATED',
+        reservice: {
+          name: 'thisIsService',
+          state: 'CREATED',
         },
       });
     });
@@ -89,27 +89,28 @@ describe('reservice', () => {
       const payloadCreator = (arg1, arg2) => ({ foo: arg1, bar: arg2 });
 
       expect(createService('SERVICE_NAME', payloadCreator)('yo', 'ya')).toEqual({
-        type: 'CALL_SERVICE',
+        type: 'CALL_RESERVICE',
         payload: {
           foo: 'yo',
           bar: 'ya',
         },
-        meta: {
-          serviceName: 'SERVICE_NAME',
-          serviceState: 'CREATED',
+        reservice: {
+          name: 'SERVICE_NAME',
+          state: 'CREATED',
         },
       });
     });
   });
 
   describe('isBadService()', () => {
-    it('should detect no meta issue', () => {
+    it('should detect no reservice issue', () => {
       expect(isBadService({ type: 'CALL_SERVICE' })).toEqual({
         type: 'CALL_SERVICE',
-        payload: new ReserviceError('no action.meta', { type: 'CALL_SERVICE' }),
+        payload: new ReserviceError('no action.reservice', { type: 'CALL_SERVICE' }),
         error: true,
-        meta: {
-          serviceState: 'END',
+        meta: undefined,
+        reservice: {
+          state: 'END',
           previous_action: {
             type: 'CALL_SERVICE',
           },
@@ -117,16 +118,17 @@ describe('reservice', () => {
       });
     });
 
-    it('should detect no meta.serviceName issue', () => {
-      expect(isBadService({ type: 'CALL_SERVICE', meta: {} })).toEqual({
+    it('should detect no reservice.name issue', () => {
+      expect(isBadService({ type: 'CALL_SERVICE', reservice: {} })).toEqual({
         type: 'CALL_SERVICE',
-        payload: new ReserviceError('no action.meta.serviceName'),
+        payload: new ReserviceError('no action.reservice.name'),
         error: true,
-        meta: {
-          serviceState: 'END',
+        meta: undefined,
+        reservice: {
+          state: 'END',
           previous_action: {
             type: 'CALL_SERVICE',
-            meta: {},
+            reservice: {},
           },
         },
       });

@@ -2,7 +2,7 @@ import { createAction } from 'redux-actions';
 import yfetch from 'yfetch';
 import debug from 'debug';
 
-export const ACTION_CALL_SERVICE = 'CALL_SERVICE';
+export const ACTION_TYPE_RESERVICE = 'CALL_RESERVICE';
 export const STATE_CREATED = 'CREATED';
 export const STATE_BEGIN = 'BEGIN';
 export const STATE_END = 'END';
@@ -22,15 +22,21 @@ const debugFail = debug('reservice:fail');
 const debugError = debug('reservice:error');
 
 // A helper function to help you to create actionCreator for a service
-export const createService = (name, payloadCreator) => {
-  const actionCreator = createAction(ACTION_CALL_SERVICE, payloadCreator, () => ({
-    serviceName: name,
-    serviceState: STATE_CREATED,
-  }));
+export const createService = (name, payloadCreator, metaCreator) => {
+  const actionCreator = createAction(ACTION_TYPE_RESERVICE, payloadCreator, metaCreator);
 
-  actionCreator.toString = () => name;
+  const serviceCreator = function () {
+    const action = actionCreator(...arguments);
+    action.reservice = {
+      name,
+      state: STATE_CREATED,
+    };
+    return action;
+  };
 
-  return actionCreator;
+  serviceCreator.toString = () => name;
+
+  return serviceCreator;
 };
 
 export class ReserviceError extends Error {
@@ -44,42 +50,49 @@ export class ReserviceError extends Error {
 
 const resultAction = (action, payload) => {
   const error = payload instanceof Error;
+  const { type, reservice = {}, meta } = action;
+  const name = reservice.name || type;
 
   if (error) {
-    debugFail('name: %s - payload: %o - error: %s', action.meta ? action.meta.serviceName : undefined, action.payload, payload);
-    debugError('name: %s - payload: %o - stack: %s', action.meta ? action.meta.serviceName : undefined, action.payload, payload.stack);
+    debugFail('name: %s - payload: %o - error: %s', name, action.payload, payload);
+    debugError('name: %s - payload: %o - stack: %s', name, action.payload, payload.stack);
   } else {
-    debugSuccess('name: %s - payload: %o - result: %o', action.meta.serviceName, action.payload, payload);
+    debugSuccess('name: %s - payload: %o - result: %o', name, action.payload, payload);
   }
 
   return {
-    type: action.type,
-    meta: { ...action.meta, previous_action: action, serviceState: STATE_END },
+    type: name,
+    reservice: {
+      ...reservice,
+      previous_action: action,
+      state: STATE_END,
+    },
+    meta,
     payload,
     error,
   };
 };
 
-const toErrorAction =
-(action, message) => resultAction(action, new ReserviceError(message, action));
+const toErrorAction = (action, message) =>
+  resultAction(action, new ReserviceError(message, action));
 
 // validate the format of service action, return an error action when it is invalid
 export const isBadService = (action) => {
-  if (!action.meta) {
-    return toErrorAction(action, 'no action.meta');
+  if (!action.reservice) {
+    return toErrorAction(action, 'no action.reservice');
   }
-  if (!action.meta.serviceName) {
-    return toErrorAction(action, 'no action.meta.serviceName');
+  if (!action.reservice.name) {
+    return toErrorAction(action, 'no action.reservice.name');
   }
-  if (!action.meta.serviceState) {
-    return toErrorAction(action, 'no action.meta.serviceState');
+  if (!action.reservice.state) {
+    return toErrorAction(action, 'no action.reservice.state');
   }
   return false;
 };
 
 // check an action is service action or not, may return FSA error action if you like
 export const isService = (action = {}, returnErrorAction) => {
-  if (action.type !== ACTION_CALL_SERVICE) {
+  if ((!action.reservice) && (action.type !== ACTION_TYPE_RESERVICE)) {
     return false;
   }
 
@@ -91,15 +104,14 @@ export const isService = (action = {}, returnErrorAction) => {
   return true;
 };
 
-const isEnd = action => action.meta.serviceState === STATE_END;
-const isSuccess = action => (isEnd(action) && !action.error);
+const isEnd = action => action.reservice.state === STATE_END;
 
 const handleServiceResult =
 (store, next, action) => result => store.dispatch(resultAction(action, result));
 
 const executeServiceAtServer = (action, request) => {
   // service definition check
-  const serviceName = action.meta.serviceName;
+  const serviceName = action.reservice.name;
   const service = SERVICE_LIST[serviceName];
 
   if (!service) {
@@ -107,7 +119,7 @@ const executeServiceAtServer = (action, request) => {
   }
 
   try {
-    action.meta.serviceState = STATE_BEGIN;
+    action.reservice.state = STATE_BEGIN;
     return Promise.resolve(service(action.payload, request));
   } catch (E) {
     return Promise.reject(E);
@@ -185,7 +197,7 @@ export const serviceMiddleware = store => next => (action) => {
     return result;
   }
 
-  debugStart('name: %s - payload: %o', action.meta.serviceName, action.payload);
+  debugStart('name: %s - payload: %o', action.reservice.name, action.payload);
 
   let job;
 
@@ -202,39 +214,6 @@ export const serviceMiddleware = store => next => (action) => {
   const handle = handleServiceResult(store, next, action);
 
   return job.then(handle, handle);
-};
-
-// A helper function to help you to create a reducer for services
-export const handleServiceActions =
-(serviceReducers = {}, defaultState = {}) => (state = defaultState, action) => {
-  const srv = isService(action, true);
-
-  if (!srv || srv.error) {
-    return state;
-  }
-
-  const reducer = serviceReducers[action.meta.serviceName];
-  if (!reducer) {
-    return state;
-  }
-
-  if (!isEnd(action)) {
-    if (reducer.begin) {
-      return reducer.begin(state, action);
-    }
-    return state;
-  }
-
-
-  if (!isSuccess(action) && reducer.throw) {
-    return reducer.throw(state, action);
-  }
-
-  if (reducer.next) {
-    return reducer.next(state, action);
-  }
-
-  return reducer(state, action);
 };
 
 const responseServiceResult = res => result => res.send(JSON.stringify(result));
@@ -282,7 +261,7 @@ export const createMiddlewareByServiceList = (serviceList) => {
       return next(srv.payload);
     }
 
-    debugReceive('name: %s - payload: %o', action.meta.serviceName, action.payload);
+    debugReceive('name: %s - payload: %o', action.reservice.name, action.payload);
 
     // no matter success or failed, response result to client.
     return executeServiceAtServer(action, req)
