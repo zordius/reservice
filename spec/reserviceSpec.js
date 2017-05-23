@@ -134,18 +134,19 @@ describe('reservice', () => {
       });
     });
 
-    it('should detect no meta.serviceState issue', () => {
-      expect(isBadService({ type: 'CALL_SERVICE', meta: { serviceName: 'OK' } })).toEqual({
-        type: 'CALL_SERVICE',
-        payload: new ReserviceError('no action.meta.serviceState'),
+    it('should detect no reservice.state issue', () => {
+      expect(isBadService({ type: 'CALL_SERVICE', reservice: { name: 'OKLA' } })).toEqual({
+        type: 'OKLA',
+        payload: new ReserviceError('no action.reservice.state'),
         error: true,
-        meta: {
-          serviceName: 'OK',
-          serviceState: 'END',
+        meta: undefined,
+        reservice: {
+          name: 'OKLA',
+          state: 'END',
           previous_action: {
             type: 'CALL_SERVICE',
-            meta: {
-              serviceName: 'OK',
+            reservice: {
+              name: 'OKLA',
             },
           },
         },
@@ -167,18 +168,20 @@ describe('reservice', () => {
     });
 
     it('should return false when is not a valid service action', () => {
-      expect(isService({ type: 'CALL_SERVICE' })).toEqual(null);
+      expect(isService({ reservice: 'CALL_SERVICE' })).toEqual(null);
     });
 
     it('should return error action when required', () => {
-      expect(isService({ type: 'CALL_SERVICE' }, true)).toEqual({
-        type: 'CALL_SERVICE',
-        payload: new ReserviceError('no action.meta'),
+      expect(isService({ reservice: { foo: 1 } }, true)).toEqual({
+        type: undefined,
+        payload: new ReserviceError('no action.reservice.name'),
         error: true,
-        meta: {
-          serviceState: 'END',
+        meta: undefined,
+        reservice: {
+          foo: 1,
+          state: 'END',
           previous_action: {
-            type: 'CALL_SERVICE',
+            reservice: { foo: 1},
           },
         },
       });
@@ -230,17 +233,18 @@ describe('reservice', () => {
       const store = mockStore();
       return serviceMiddleware(store)(() => 0)(createService('foo')()).then(() => {
         expect(store.dispatch).toHaveBeenCalledWith({
-          type: 'CALL_SERVICE',
+          type: 'foo',
           payload: { foo: 'OK' },
           error: false,
-          meta: {
-            serviceName: 'foo',
-            serviceState: 'END',
+          meta: undefined,
+          reservice: {
+            name: 'foo',
+            state: 'END',
             previous_action: {
-              type: 'CALL_SERVICE',
-              meta: {
-                serviceName: 'foo',
-                serviceState: 'CREATED',
+              type: 'CALL_RESERVICE',
+              reservice: {
+                name: 'foo',
+                state: 'CREATED',
               },
             },
           },
