@@ -256,17 +256,18 @@ describe('reservice', () => {
       const store = mockStore();
       return serviceMiddleware(store)(() => 0)(createService('err1')()).then(() => {
         expect(store.dispatch).toHaveBeenCalledWith({
-          type: 'CALL_SERVICE',
+          type: 'err1',
           payload: new Error('err1 message'),
           error: true,
-          meta: {
-            serviceName: 'err1',
-            serviceState: 'END',
+          meta: undefined,
+          reservice: {
+            name: 'err1',
+            state: 'END',
             previous_action: {
-              type: 'CALL_SERVICE',
-              meta: {
-                serviceName: 'err1',
-                serviceState: 'CREATED',
+              type: 'CALL_RESERVICE',
+              reservice: {
+                name: 'err1',
+                state: 'CREATED',
               },
             },
           },
@@ -278,17 +279,18 @@ describe('reservice', () => {
       const store = mockStore();
       return serviceMiddleware(store)(() => 0)(createService('err2')()).then(() => {
         expect(store.dispatch).toHaveBeenCalledWith({
-          type: 'CALL_SERVICE',
+          type: 'err2',
           payload: new ReserviceError('err2 message', { action: 'foo' }),
           error: true,
-          meta: {
-            serviceName: 'err2',
-            serviceState: 'END',
+          meta: undefined,
+          reservice: {
+            name: 'err2',
+            state: 'END',
             previous_action: {
-              type: 'CALL_SERVICE',
-              meta: {
-                serviceName: 'err2',
-                serviceState: 'CREATED',
+              type: 'CALL_RESERVICE',
+              reservice: {
+                name: 'err2',
+                state: 'CREATED',
               },
             },
           },
@@ -300,17 +302,18 @@ describe('reservice', () => {
       const store = mockStore();
       return serviceMiddleware(store)(() => 0)(createService('err3')()).then(() => {
         expect(store.dispatch).toHaveBeenCalledWith({
-          type: 'CALL_SERVICE',
+          type: 'err3',
           payload: new ReserviceError('err3 message', { action: 'foo' }),
           error: true,
-          meta: {
-            serviceName: 'err3',
-            serviceState: 'END',
+          meta: undefined,
+          reservice: {
+            name: 'err3',
+            state: 'END',
             previous_action: {
-              type: 'CALL_SERVICE',
-              meta: {
-                serviceName: 'err3',
-                serviceState: 'CREATED',
+              type: 'CALL_RESERVICE',
+              reservice: {
+                name: 'err3',
+                state: 'CREATED',
               },
             },
           },
