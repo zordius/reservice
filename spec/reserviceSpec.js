@@ -361,8 +361,8 @@ describe('reservice', () => {
 
     it('should call next with error when action is not a valid service action', () => {
       const next = jasmine.createSpy('next');
-      middleware({ originalUrl: mockServerURL, method: 'POST', body: { type: 'CALL_SERVICE' } }, undefined, next);
-      expect(next).toHaveBeenCalledWith(new ReserviceError('no action.meta'));
+      middleware({ originalUrl: mockServerURL, method: 'POST', body: { reservice: { } } }, undefined, next);
+      expect(next).toHaveBeenCalledWith(new ReserviceError('no action.reservice.name'));
     });
 
     it('should execute service', (done) => {
