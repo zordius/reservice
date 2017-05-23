@@ -370,11 +370,11 @@ describe('reservice', () => {
         originalUrl: mockServerURL,
         method: 'POST',
         body: {
-          type: 'CALL_SERVICE',
+          type: 'CALL_RESERVICE',
           payload: { good: 'morning' },
-          meta: {
-            serviceName: 'bar',
-            serviceState: 'CREATED',
+          reservice: {
+            name: 'bar',
+            state: 'CREATED',
           },
         },
       };
@@ -394,10 +394,10 @@ describe('reservice', () => {
         originalUrl: mockServerURL,
         method: 'POST',
         body: {
-          type: 'CALL_SERVICE',
-          meta: {
-            serviceName: 'not_found',
-            serviceState: 'CREATED',
+          type: 'CALL_RESERVICE',
+          reservice: {
+            name: 'not_found',
+            state: 'CREATED',
           },
         },
       };
@@ -407,10 +407,10 @@ describe('reservice', () => {
           expect(err).toEqual(JSON.stringify({
             message: 'can not find service named as "not_found" in serviceList',
             action: {
-              type: 'CALL_SERVICE',
-              meta: {
-                serviceName: 'not_found',
-                serviceState: 'CREATED',
+              type: 'CALL_RESERVICE',
+              reservice: {
+                name: 'not_found',
+                state: 'CREATED',
               },
             },
           }));
@@ -424,10 +424,10 @@ describe('reservice', () => {
         originalUrl: mockServerURL,
         method: 'POST',
         body: {
-          type: 'CALL_SERVICE',
-          meta: {
-            serviceName: 'err',
-            serviceState: 'CREATED',
+          type: 'CALL_RESERVICE',
+          reservice: {
+            name: 'err',
+            state: 'CREATED',
           },
         },
       };
@@ -456,16 +456,19 @@ describe('reservice', () => {
 
     it('should next() error action when action is bad service action', () => {
       const next = jasmine.createSpy('next');
-      serviceMiddleware()(next)({ type: 'CALL_SERVICE' });
+      serviceMiddleware()(next)({ type: 'CX', reservice: { foo: 1 } });
       expect(next).toHaveBeenCalledWith({
-        type: 'CALL_SERVICE',
-        payload: new ReserviceError('no action.meta'),
+        type: 'CX',
+        payload: new ReserviceError('no action.reservice.name'),
         error: true,
-        meta: {
+        meta: undefined,
+        reservice: {
+          foo: 1,
           previous_action: {
-            type: 'CALL_SERVICE',
+            type: 'CX',
+            reservice: { foo: 1 },
           },
-          serviceState: 'END',
+          state: 'END',
         },
       });
     });
