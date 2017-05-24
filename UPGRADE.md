@@ -23,7 +23,7 @@ expect(doSomeThing('good')).toEqual({
     serviceState: 'CREATED',
   },
 });
-</pre></td><td></pre>
+</pre></td><td><pre>
 import { createService } from 'reservice';
 
 const doSomeThing = createService('DO_SOMETHING', payloadCreator);
@@ -68,7 +68,7 @@ When the action is handled by middleware, another action will be dispatched.
     },
   },
 }
-</pre></td><td></pre>
+</pre></td><td><pre>
 {
   type: 'DO_SOMETHING',
   payload: 'result',
@@ -109,7 +109,7 @@ const myReducer = handleServiceActions({
   [anotherServiceCreator]: anotherReducer,
   ...
 }, initialState);
-</pre></td><td></pre>
+</pre></td><td><pre>
 import { handleActions } from 'redux-actions';
 
 // create a reducer
