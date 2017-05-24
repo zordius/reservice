@@ -25,8 +25,8 @@ const debugError = debug('reservice:error');
 export const createService = (name, payloadCreator, metaCreator) => {
   const actionCreator = createAction(ACTION_TYPE_RESERVICE, payloadCreator, metaCreator);
 
-  const serviceCreator = function () {
-    const action = actionCreator(...arguments);
+  const serviceCreator = function serviceCreator(...args) {
+    const action = actionCreator(...args);
     action.reservice = {
       name,
       state: STATE_CREATED,

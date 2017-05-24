@@ -3,7 +3,7 @@ import * as reservice from '../src';
 
 const { ReserviceError, createService, isBadService,
         isService, setupServiceEndpoint, createMiddlewareByServiceList,
-        serviceMiddleware, handleServiceActions, settleRequest } = reservice;
+        serviceMiddleware, settleRequest } = reservice;
 
 describe('reservice', () => {
   const mockServerHOST = 'http://test';
@@ -181,7 +181,7 @@ describe('reservice', () => {
           foo: 1,
           state: 'END',
           previous_action: {
-            reservice: { foo: 1},
+            reservice: { foo: 1 },
           },
         },
       });
