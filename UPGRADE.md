@@ -3,7 +3,7 @@ Upgrade from 0.0.2 to 0.1.0
 
 * **BREAK CHANGE** the format of action changed
 * **BREAK CHANGE** `handleServiceAction` retired
-* MIGRATION EXAMPLE: fd5f7db4c77d1e6e1ad6d5d148e75033275b6995
+* MIGRATION EXAMPLE: https://github.com/zordius/reservice/commit/fd5f7db4c77d1e6e1ad6d5d148e75033275b6995
 
 **The action creator**
 
