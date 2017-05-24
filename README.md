@@ -62,9 +62,9 @@ const doSomeThing = createService('DO_SOMETHING', payloadCreator);
 expect(doSomeThing('good')).toEqual({
   type: 'CALL_SERVICE',
   payload: 'good',
-  meta: {
-    serviceName: 'DO_SOMETHING',
-    serviceState: 'CREATED',
+  reservice: {
+    name: 'DO_SOMETHING',
+    state: 'CREATED',
   },
 });
 ```
@@ -95,55 +95,14 @@ app.use(createMiddlewareByServiceList(serviceList));
 
 **The Reducer**
 ```javascript
-import { handleServiceActions } from 'reservice';
+import { handleActions } from 'redux-actions';
 
-// create a reducer only deal with ended service action by default
-const myReducer = handleServiceActions({
+// create a reducer
+const myReducer = handleActions({
   [doSomeThing]: (state, action) => { ... },
   [anotherServiceCreator]: anotherReducer,
   ...
-}, defaultState);
-```
-
-If you also want to handle different service action status:
-```javascript
-import { handleServiceActions } from 'reservice';
-
-const myReducer = handleServiceActions({
-  [doSomeThing]: {
-    begin: (state, action) => { ... },  // executes when started
-    next: (state, action) => { ... },   // executes when end and success
-    throw: (state, action) => { ... },  // executes when end and failed
-  [anotherServiceCreator]: anotherReducer,
-  ...
-}, defaultState);
-```
-You can also mix normal reducers and service reducer:
-```javascript
-import { handleServiceActions } from 'reservice';
-
-const defaultState = {
-  isLoading: false,
-  apiresult: {},
-}
-
-const serviceReducer = handleServiceActions({
-  [callApi]: {
-    begin: (state, action) => { ...state, isLoading: true },
-    next: (state, action) => { ...state, isLoading: true, apiresult: action.payload },
-  }
-}, defaultState);
-
-export reducer = (state = defaultState, action) => {
-  switch (action.type) {
-  case 'START_LOADING':
-    return {...state, isLoading: true}
-  case 'STOP_LOADING':
-    return {...state, isLoading: false}
-  default:
-    return serviceReducer(state, action);
-  }
-}
+}, initialState);
 ```
 
 **Setup Redux Store**
