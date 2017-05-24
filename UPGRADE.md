@@ -3,7 +3,7 @@ Upgrade from 0.0.2 to 0.1.0
 
 **The action creator**
 
-Code is not changed, but the action format is changed.
+Code is not changed, but the action format is changed. If you want to deal with 'service started' signal, you can focus on `action.type === 'CALL_RESERVICE'`
 
 <table>
  <tr>
