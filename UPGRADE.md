@@ -109,7 +109,9 @@ Because we changed the action format, now you can use <a href="https://www.npmjs
   <th>0.0.2</th><th>0.1.0</th>
  </tr>
  <tr valign="top">
-  <td><pre>
+  <td>
+
+```javascript
 import { handleServiceActions } from 'reservice';
 
 const myReducer = handleServiceActions({
@@ -117,7 +119,11 @@ const myReducer = handleServiceActions({
   [anotherServiceCreator]: anotherReducer,
   ...
 }, initialState);
-</pre></td><td><pre>
+```
+
+</td><td>
+
+```javascript
 import { handleActions } from 'redux-actions';
 
 // create a reducer
@@ -126,6 +132,8 @@ const myReducer = handleActions({
   [anotherServiceCreator]: anotherReducer,
   ...
 }, initialState);
-</pre></td>
+```
+
+</td>
  </tr>
 </table>
