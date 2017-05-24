@@ -1,5 +1,5 @@
 // In this example you can see a common reducer coding style for service actions
-import { handleServiceActions } from 'reservice'
+import { handleActions } from 'redux-actions'
 
 import { yelpSearch, yelpBusiness } from '../actions/yelp'
 
@@ -22,4 +22,4 @@ const reducers = {
 // If you like to split the reducer logics, put them into sub directory,
 // or export as another name.
 // handleServiceActions() help you to create a reducer function for service actions
-export default handleServiceActions(reducers, initialState)
+export default handleActions(reducers, initialState)
