@@ -65,7 +65,6 @@ When the action is handled by middleware, another action will be dispatched.
 {
   type: 'CALL_SERVICE',
   payload: 'result',
-  error: false,
   meta: {
     serviceName: 'DO_SOMETHING',
     serviceState: 'END',
@@ -83,7 +82,6 @@ When the action is handled by middleware, another action will be dispatched.
 {
   type: 'DO_SOMETHING',
   payload: 'result',
-  error: false,
   meta: undefined,
   reservice: {
     name: 'DO_SOMETHING',
