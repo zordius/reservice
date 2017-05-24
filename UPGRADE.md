@@ -10,7 +10,9 @@ Code is not changed, but the action format is changed.
   <th>0.0.2</th><th>0.1.0</th>
  </tr>
  <tr valign="top">
-  <td><pre>
+  <td>
+
+```javascript
 import { createService } from 'reservice';
 
 const doSomeThing = createService('DO_SOMETHING', payloadCreator);
@@ -23,7 +25,11 @@ expect(doSomeThing('good')).toEqual({
     serviceState: 'CREATED',
   },
 });
-</pre></td><td><pre>
+```
+
+</td><td>
+
+```javascript
 import { createService } from 'reservice';
 
 const doSomeThing = createService('DO_SOMETHING', payloadCreator);
@@ -37,7 +43,9 @@ expect(doSomeThing('good')).toEqual({
     state: 'CREATED',
   },
 });
-</pre></td>
+```
+
+</td>
  </tr>
 </table>
 
@@ -59,12 +67,12 @@ When the action is handled by middleware, another action will be dispatched.
     serviceName: 'DO_SOMETHING',
     serviceState: 'END',
     previous_action: {
-			type: 'CALL_SERVICE',
-			payload: 'good',
-			meta: {
-				serviceName: 'DO_SOMETHING',
-				serviceState: 'CREATED',
-			},
+      type: 'CALL_SERVICE',
+      payload: 'good',
+      meta: {
+        serviceName: 'DO_SOMETHING',
+        serviceState: 'CREATED',
+      },
     },
   },
 }
@@ -78,14 +86,14 @@ When the action is handled by middleware, another action will be dispatched.
     name: 'DO_SOMETHING',
     state: 'END',
     previous_action: {
-			type: 'CALL_RERESERVICE',
-			payload: 'good',
-			meta: undefined,
-			reservice: {
-				name: 'DO_SOMETHING',
-				state: 'BEGIN',
-			},
-		}
+      type: 'CALL_RERESERVICE',
+      payload: 'good',
+      meta: undefined,
+      reservice: {
+        name: 'DO_SOMETHING',
+        state: 'BEGIN',
+      },
+    }
   }
 }
 </pre></td>
