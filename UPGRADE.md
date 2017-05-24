@@ -9,7 +9,7 @@ Code is not changed, but the action format is changed.
  <tr>
   <th>0.0.2</th><th>0.1.0</th>
  </tr>
- <tr>
+ <tr valign="top">
   <td><pre>
 import { createService } from 'reservice';
 
@@ -49,7 +49,7 @@ When the action is handled by middleware, another action will be dispatched.
  <tr>
   <th>0.0.2</th><th>0.1.0</th>
  </tr>
- <tr>
+ <tr valign="top">
   <td><pre>
 {
   type: 'CALL_SERVICE',
@@ -100,7 +100,7 @@ Because we changed the action format, now you can use <a href="https://www.npmjs
  <tr>
   <th>0.0.2</th><th>0.1.0</th>
  </tr>
- <tr>
+ <tr valign="top">
   <td><pre>
 import { handleServiceActions } from 'reservice';
 
