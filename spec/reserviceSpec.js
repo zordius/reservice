@@ -550,7 +550,7 @@ describe('reservice', () => {
   });
 
   describe('devSelect()', () => {
-    const selector = () => ({ foo: 'bar' })
+    const selector = () => ({ foo: 'bar' });
 
     afterEach(() => {
       process.env.NODE_ENV = 'test';
@@ -568,7 +568,7 @@ describe('reservice', () => {
   });
 
   describe('prodSelect()', () => {
-    const selector = () => ({ foo: 'moo' })
+    const selector = () => ({ foo: 'moo' });
 
     afterEach(() => {
       process.env.NODE_ENV = 'test';
