@@ -268,3 +268,6 @@ export const createMiddlewareByServiceList = (serviceList) => {
     .then(responseServiceResult(res), responseServiceError(res));
   };
 };
+
+export const devSelect = selector => result => ((process.env.NODE_ENV === 'development') ? selector(result) : result);
+export const prodSelect = selector => result => ((process.env.NODE_ENV === 'production') ? selector(result) : result);

@@ -3,7 +3,8 @@ import * as reservice from '../src';
 
 const { ReserviceError, createService, isBadService,
         isService, setupServiceEndpoint, createMiddlewareByServiceList,
-        serviceMiddleware, settleRequest } = reservice;
+        serviceMiddleware, settleRequest,
+        devSelect, prodSelect } = reservice;
 
 describe('reservice', () => {
   const mockServerHOST = 'http://test';
@@ -545,6 +546,42 @@ describe('reservice', () => {
           },
         });
       });
+    });
+  });
+
+  describe('devSelect()', () => {
+    const selector = () => ({ foo: 'bar' })
+
+    afterEach(() => {
+      process.env.NODE_ENV = 'test';
+    });
+
+    it('should call selector when in development env', () => {
+      process.env.NODE_ENV = 'development';
+      expect(devSelect(selector)(123)).toEqual({ foo: 'bar' });
+    });
+
+    it('should bypass selector when not in development env', () => {
+      process.env.NODE_ENV = 'production';
+      expect(devSelect(selector)(12345)).toEqual(12345);
+    });
+  });
+
+  describe('prodSelect()', () => {
+    const selector = () => ({ foo: 'moo' })
+
+    afterEach(() => {
+      process.env.NODE_ENV = 'test';
+    });
+
+    it('should bypass selector when in development env', () => {
+      process.env.NODE_ENV = 'development';
+      expect(prodSelect(selector)(1234)).toEqual(1234);
+    });
+
+    it('should call selector when not in development env', () => {
+      process.env.NODE_ENV = 'production';
+      expect(prodSelect(selector)(12345)).toEqual({ foo: 'moo' });
     });
   });
 });
