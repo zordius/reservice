@@ -124,3 +124,40 @@ Example
 -------
 
 Please check <a href="example">example</a> to get a deeper guide.
+
+Selector
+--------
+
+In most case you may try to refine API response data by selector function then put it into redux store. You can do it inthe service, or do it in the reducer.
+
+If you run selector in the service, you dispatch only selected data to reducer. This practice save time and space when the smaller service result be transmitted from server to client, but prevent you to see full API response in network or redux debugging tools.
+
+If you run selector in the reducer, you dispatch full data to reducer. This practice may take more time and space to transmit result from server to client, but you can see full API response in debug tools.
+
+Reservice provide two small functions to help you adopt all these two practices in development and production environments:
+
+```javascript
+// The selector function
+const mySelector = result => ({
+  data: result.body.data.reduce(refineMyData, {}),
+  error: result.body.error
+});
+
+// In a service
+import { prodSelect } from 'reservice';
+// Run your selector only when in production environment, keep original result when in development environment.
+const myProdSelector = prodSelect(mySelector);
+const myService = payload => callAPI(payload).then(result => myRrodSelector(result));
+
+// In a reducer
+import { devSelect } from 'reservice';
+// Run your selector only when in development environment, keep original result when in production environment.
+const myDevSelector = devSelect(mySelector);
+const myReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case 'MY_SERVICE':
+      return { ...state, ...myDevSelector(action.payload) }
+  }
+  return state;
+}
+```
