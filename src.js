@@ -90,7 +90,7 @@ const resultAction = (action, payload) => {
     if (selector) {
       ret.reservice.full_payload = payload;
       ret.payload = selector(payload);
-      debugSelect('name: %s - payload: %o - result: %o', name, action.payload, payload);
+      debugSelect('name: %s - payload: %o - result: %o', name, action.payload, ret.payload);
     }
   }
 
