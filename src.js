@@ -14,10 +14,12 @@ let SERVICE_TRANSPORT_PATH = DEFAULT_TRANSPORT_PATH;
 let SERVICE_TRANSPORT_METHOD = DEFAULT_TRANSPORT_METHOD;
 
 let SERVICE_LIST = 0;
+const SELECTOR_LIST = {};
 
 const debugStart = debug('reservice:start');
 const debugReceive = debug('reservice:receive');
 const debugSuccess = debug('reservice:success');
+const debugSelect = debug('reservice:select');
 const debugFail = debug('reservice:fail');
 const debugError = debug('reservice:error');
 
@@ -48,7 +50,8 @@ export class ReserviceError extends Error {
   }
 }
 
-const resultAction = (action, payload) => {
+const resultAction = (action, inputPayload) => {
+  let payload = inputPayload;
   const error = payload instanceof Error;
   const { type, reservice = {}, meta } = action;
   const name = reservice.name || type;
@@ -58,6 +61,12 @@ const resultAction = (action, payload) => {
     debugError('name: %s - payload: %o - stack: %s', name, action.payload, payload.stack);
   } else {
     debugSuccess('name: %s - payload: %o - result: %o', name, action.payload, payload);
+    const selector = SELECTOR_LIST[name];
+    if (selector) {
+      reservice.full_payload = inputPayload;
+      payload = selector(payload);
+      debugSelect('name: %s - payload: %o - result: %o', name, action.payload, payload);
+    }
   }
 
   return {
@@ -220,6 +229,43 @@ const responseServiceResult = res => result => res.send(JSON.stringify(result));
 const responseServiceError = res =>
   err => res.status(555).send(JSON.stringify(err, serializeError));
 
+export const devSelect = selector => result => ((process.env.NODE_ENV === 'development') ? selector(result) : result);
+export const prodSelect = selector => result => ((process.env.NODE_ENV === 'production') ? selector(result) : result);
+
+const refineServiceList = (serviceList) => {
+  const services = {};
+
+  Object.keys(serviceList).forEach((name) => {
+    const service = serviceList[name];
+
+    if (typeof service === 'function') {
+      services[name] = service;
+      return;
+    }
+
+    if (!service.service || !service.selector) {
+      throw new ReserviceError(`The service named as "${name}" in serviceList should be a function or { service, selector }, it is ${service} now`);
+    }
+
+    if (typeof service.service !== 'function') {
+      throw new ReserviceError(`The service named as "${name}" in serviceList defined as { service, selector }, but the { service } is not a function, it is ${service.service} now`);
+    }
+
+    if (typeof service.selector !== 'function') {
+      throw new ReserviceError(`The service named as "${name}" in serviceList defined as { service, selector }, but the { selector } is not a function, it is ${service.selector} now`);
+    }
+
+    if (process.env.NODE_ENV === 'production') {
+      services[name] = (...args) => service.service(...args).then(service.selector);
+    } else {
+      services[name] = service.service;
+      SELECTOR_LIST[name] = service.selector;
+    }
+  });
+
+  return services;
+};
+
 // create an express middleware to handle service action from client side
 export const createMiddlewareByServiceList = (serviceList) => {
   // no serviceList error
@@ -236,7 +282,7 @@ export const createMiddlewareByServiceList = (serviceList) => {
     throw new ReserviceError('createMiddlewareByServiceList() should not be executed at client side!');
   }
 
-  SERVICE_LIST = serviceList;
+  SERVICE_LIST = refineServiceList(serviceList);
 
   return (req, res, next) => {
     // method or url different, pass
@@ -268,6 +314,3 @@ export const createMiddlewareByServiceList = (serviceList) => {
     .then(responseServiceResult(res), responseServiceError(res));
   };
 };
-
-export const devSelect = selector => result => ((process.env.NODE_ENV === 'development') ? selector(result) : result);
-export const prodSelect = selector => result => ((process.env.NODE_ENV === 'production') ? selector(result) : result);
