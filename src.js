@@ -178,6 +178,7 @@ const transportServiceToServer = action => yfetch({
   json: true,
   method: SERVICE_TRANSPORT_METHOD,
   url: SERVICE_TRANSPORT_PATH,
+  credentials: 'include',
   body: JSON.stringify(action),
 }).then(response =>
   ((response.status === 555) ? convertError(response.body) : response.body));
