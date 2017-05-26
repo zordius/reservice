@@ -143,7 +143,7 @@ Debug
   * `reservice:success` : show service name, payload and result when service successed
   * `reservice:fail` : show service name, payload and error when service failed
   * `reservice:error` : show service name, payload and error.stack when service failed
-  * `reservice:select` : show service name, payload and selected result when service successed
+  * `reservice:select` : show service name, payload and selected result when service successed, refer to <a href="https://github.com/zordius/reservice#advanced-usage-selector">selector</a>.
 
 Optional Usage: Selector
 ------------------------
