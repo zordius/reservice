@@ -18,14 +18,17 @@ const services = {
       : []
     ))
   : false),
-  business: params => yelp.business(params).then(B => ({
-    name: B.name,
-    mobile_url: B.mobile_url,
-    rating_img_url_small: B.rating_img_url_small,
-    url: B.url,
-    phone: B.phone,
-    image_url: B.image_url
-  }))
+  business: {
+    service: params => yelp.business(params),
+    selector: B => ({
+      name: B.name,
+      mobile_url: B.mobile_url,
+      rating_img_url_small: B.rating_img_url_small,
+      url: B.url,
+      phone: B.phone,
+      image_url: B.image_url
+    }),
+  }
 }
 
 export default services
