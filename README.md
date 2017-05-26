@@ -125,8 +125,8 @@ Example
 
 Please check <a href="example">example</a> to get a deeper guide.
 
-Selector
---------
+Optional Usage: Selector
+------------------------
 
 In most case you may try to refine API response data by selector function then put it into redux store. You can do it inthe service, or do it in the reducer.
 
@@ -161,3 +161,19 @@ const myReducer = (state = initialState, action) => {
   return state;
 }
 ```
+
+Advanced Usage: Selector
+------------------------
+
+Or, you can define service as { service, selector } , reservice will keep full result in action.reservice.full_payload for debugging when not in production environment. And, the selected result still be placed in action.payload.
+
+```javascript
+// Original Service code with result selector
+const selectResult = (result) => result.body.items;
+export myService = (payload, req) => callSomeApi({ ...payload, req }).then(selectResult);
+
+// change export from function into { service , selector } for better debugging info
+export myService = {
+  service: (payload, req) => callSomeApi({ ...payload, req }),
+  selector: (result) => result.body.items,
+};
