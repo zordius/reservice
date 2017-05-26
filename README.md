@@ -187,3 +187,6 @@ export myService = {
   service: (payload, req) => callSomeApi({ ...payload, req }),
   selector: (result) => result.body.items,
 };
+```
+
+Here is a <a href="https://github.com/zordius/reservice/commit/89916ad3774b25942ae5e88aa44d0a4463e7b9ec">migration example</a> to adopt reservice selector.
