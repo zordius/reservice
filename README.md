@@ -125,6 +125,16 @@ Example
 
 Please check <a href="example">example</a> to get a deeper guide.
 
+Debug
+-----
+
+* reservice already adopt [debug](https://www.npmjs.com/package/debug) , you can export DEBUG=... to show debug log:
+  * `reservice:start` : show service name, payload
+  * `reservice:receive` : show service name, payload when client side dispatch received
+  * `reservice:success` : show service name, payload and result when service successed
+  * `reservice:fail` : show service name, payload and error when service failed
+  * `reservice:error` : show service name, payload and error.stack when service failed
+
 Optional Usage: Selector
 ------------------------
 
