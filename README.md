@@ -56,7 +56,7 @@ import { createService } from 'reservice';
 const doSomeThing = createService('DO_SOMETHING', payloadCreator);
 
 expect(doSomeThing('good')).toEqual({
-  type: 'CALL_SERVICE',
+  type: 'CALL_RESERVICE',
   payload: 'good',
   reservice: {
     name: 'DO_SOMETHING',
