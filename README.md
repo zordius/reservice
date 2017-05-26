@@ -99,6 +99,18 @@ const myReducer = handleActions({
   [anotherServiceCreator]: anotherReducer,
   ...
 }, initialState);
+
+// If you also want to take care service start, try this
+import { ACTION_TYPE_RESERVICE } from 'reservice';
+
+const nowLoadingReducer = (state = initialState, action) => {
+  if (action.type !== ACTION_TYPE_RESERVICE) {
+    return state;
+  }
+
+  // service started, remeber to set nowLoading to false in yourown reducers.
+  return { ...state, nowLoading: true };
+}
 ```
 
 **Setup Redux Store**
