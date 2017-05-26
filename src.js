@@ -88,7 +88,7 @@ const resultAction = (action, payload) => {
     debugSuccess('name: %s - payload: %o - result: %o', name, action.payload, payload);
     const selector = SELECTOR_LIST[name];
     if (selector) {
-      ret.reservice.full_payload = payload;
+      ret.reservice.full_result = payload;
       ret.payload = selector(payload);
       debugSelect('name: %s - payload: %o - result: %o', name, action.payload, ret.payload);
     }

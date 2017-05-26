@@ -581,7 +581,7 @@ describe('reservice', () => {
           reservice: {
             name: 'sel',
             state: 'END',
-            full_payload: {
+            full_result: {
               foo: { bar: { moo: 'ha' } },
             },
             previous_action: {
