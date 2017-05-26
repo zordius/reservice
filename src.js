@@ -50,26 +50,11 @@ export class ReserviceError extends Error {
   }
 }
 
-const resultAction = (action, inputPayload) => {
-  let payload = inputPayload;
+const resultAction = (action, payload) => {
   const error = payload instanceof Error;
   const { type, reservice = {}, meta } = action;
   const name = reservice.name || type;
-
-  if (error) {
-    debugFail('name: %s - payload: %o - error: %s', name, action.payload, payload);
-    debugError('name: %s - payload: %o - stack: %s', name, action.payload, payload.stack);
-  } else {
-    debugSuccess('name: %s - payload: %o - result: %o', name, action.payload, payload);
-    const selector = SELECTOR_LIST[name];
-    if (selector) {
-      reservice.full_payload = inputPayload;
-      payload = selector(payload);
-      debugSelect('name: %s - payload: %o - result: %o', name, action.payload, payload);
-    }
-  }
-
-  return {
+  const ret = {
     type: name,
     reservice: {
       ...reservice,
@@ -80,6 +65,21 @@ const resultAction = (action, inputPayload) => {
     payload,
     error,
   };
+
+  if (error) {
+    debugFail('name: %s - payload: %o - error: %s', name, action.payload, payload);
+    debugError('name: %s - payload: %o - stack: %s', name, action.payload, payload.stack);
+  } else {
+    debugSuccess('name: %s - payload: %o - result: %o', name, action.payload, payload);
+    const selector = SELECTOR_LIST[name];
+    if (selector) {
+      ret.reservice.full_payload = payload;
+      ret.payload = selector(payload);
+      debugSelect('name: %s - payload: %o - result: %o', name, action.payload, payload);
+    }
+  }
+
+  return ret;
 };
 
 const toErrorAction = (action, message) =>

@@ -25,6 +25,13 @@ describe('reservice', () => {
     foo: param1 => param1,
     bar: (p1, p2) => ({ p1, p2 }),
     err: () => { throw new ReserviceError('bad'); },
+    not_function: { foo: 'bar' },
+    service_not_function: { service: 3, selector: 4 },
+    selector_not_function: { service: () => 345, selector: 4 },
+    sel: {
+      service: () => ({ foo: { bar: { moo: 'ha' } } }),
+      selector: input => input.foo.bar,
+    },
   };
 
   let middleware;
@@ -201,6 +208,21 @@ describe('reservice', () => {
 
     it('should error when no serviceList', () => {
       expect(createMiddlewareByServiceList).toThrow(new ReserviceError('No serviceList for service middleware! Check the serviceList in your createMiddlewareByServiceList(serviceList)'));
+    });
+
+    it('should report bad service when it is not a function', () => {
+      expect(() => createMiddlewareByServiceList(serviceList)).toThrow(new ReserviceError('The service named as "not_function" in serviceList should be a function or { service, selector }, it is [object Object] now'));
+      delete serviceList.not_function;
+    });
+
+    it('should report bad { service } when it is not a function', () => {
+      expect(() => createMiddlewareByServiceList(serviceList)).toThrow(new ReserviceError('The service named as "service_not_function" in serviceList defined as { service, selector }, but the { service } is not a function, it is 3 now'));
+      delete serviceList.service_not_function;
+    });
+
+    it('should report bad { selector } when it is not a function', () => {
+      expect(() => createMiddlewareByServiceList(serviceList)).toThrow(new ReserviceError('The service named as "selector_not_function" in serviceList defined as { service, selector }, but the { selector } is not a function, it is 4 now'));
+      delete serviceList.selector_not_function;
     });
 
     it('should error when at client side', () => {
@@ -540,6 +562,33 @@ describe('reservice', () => {
               payload: 456,
               reservice: {
                 name: 'bar',
+                state: 'BEGIN',
+              },
+            },
+          },
+        });
+      });
+    });
+
+    it('should run selector with debug info when not in production env', () => {
+      const store = mockStore();
+      return serviceMiddleware(store)(() => 0)(createService('sel')(456)).then(() => {
+        expect(store.dispatch).toHaveBeenCalledWith({
+          type: 'sel',
+          payload: { moo: 'ha' },
+          error: false,
+          meta: undefined,
+          reservice: {
+            name: 'sel',
+            state: 'END',
+            full_payload: {
+              foo: { bar: { moo: 'ha' } },
+            },
+            previous_action: {
+              type: 'CALL_RESERVICE',
+              payload: 456,
+              reservice: {
+                name: 'sel',
                 state: 'BEGIN',
               },
             },
