@@ -27,7 +27,7 @@ const services = {
       url: B.url,
       phone: B.phone,
       image_url: B.image_url
-    }),
+    })
   }
 }
 
