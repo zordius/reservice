@@ -4,7 +4,7 @@ import * as reservice from '../src';
 const { ReserviceError, createService, isBadService,
         isService, setupServiceEndpoint, createMiddlewareByServiceList,
         serviceMiddleware, settleRequest,
-        devSelect, prodSelect } = reservice;
+        devSelect, prodSelect, resetServiceList } = reservice;
 
 describe('reservice', () => {
   const mockServerHOST = 'http://test';
@@ -631,6 +631,66 @@ describe('reservice', () => {
     it('should call selector when not in development env', () => {
       process.env.NODE_ENV = 'production';
       expect(prodSelect(selector)(12345)).toEqual({ foo: 'moo' });
+    });
+  });
+
+  describe('resetServiceList()', () => {
+    let oldWindow;
+
+    beforeAll(() => {
+      oldWindow = global.window;
+    });
+    afterEach(() => {
+      global.window = oldWindow;
+      process.env.NODE_ENV = 'test';
+    });
+
+    it('should clear service list', () => {
+      resetServiceList();
+    });
+
+    it('should warn when not in test env', () => {
+      spyOn(console, 'warn');
+      process.env.NODE_ENV = 'bala';
+      resetServiceList();
+      expect(console.warn).toHaveBeenCalledWith('resetServiceList() should only be called for testing but current NODE_ENV is "bala"');
+    });
+
+    it('should throw when at client side', () => {
+      global.window = 1;
+      expect(() => resetServiceList()).toThrow(new ReserviceError('resetServiceList() should not be called at client side!'));
+    });
+  });
+
+  describe('serviceMiddleware() in production env', () => {
+    afterAll(() => {
+      process.env.NODE_ENV = 'test';
+    });
+
+    it('should run selector without debug info', () => {
+      process.env.NODE_ENV = 'production';
+      middleware = createMiddlewareByServiceList(serviceList);
+      const store = mockStore();
+      return serviceMiddleware(store)(() => 0)(createService('sel')(456)).then(() => {
+        expect(store.dispatch).toHaveBeenCalledWith({
+          type: 'sel',
+          payload: { moo: 'ha' },
+          error: false,
+          meta: undefined,
+          reservice: {
+            name: 'sel',
+            state: 'END',
+            previous_action: {
+              type: 'CALL_RESERVICE',
+              payload: 456,
+              reservice: {
+                name: 'sel',
+                state: 'BEGIN',
+              },
+            },
+          },
+        });
+      });
     });
   });
 });

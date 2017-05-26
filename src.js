@@ -23,6 +23,19 @@ const debugSelect = debug('reservice:select');
 const debugFail = debug('reservice:fail');
 const debugError = debug('reservice:error');
 
+export const resetServiceList = () => {
+  if (global.window) {
+    throw new ReserviceError('resetServiceList() should not be called at client side!');
+  }
+
+  if (process.env.NODE_ENV !== 'test') {
+    console.warn(`resetServiceList() should only be called for testing but current NODE_ENV is "${process.env.NODE_ENV}"`);
+  }
+
+  SERVICE_LIST = 0;
+  Object.keys(SELECTOR_LIST).forEach(name => delete SELECTOR_LIST[name]);
+}
+
 // A helper function to help you to create actionCreator for a service
 export const createService = (name, payloadCreator, metaCreator) => {
   const actionCreator = createAction(ACTION_TYPE_RESERVICE, payloadCreator, metaCreator);
@@ -256,7 +269,7 @@ const refineServiceList = (serviceList) => {
     }
 
     if (process.env.NODE_ENV === 'production') {
-      services[name] = (...args) => service.service(...args).then(service.selector);
+      services[name] = (payload, req) => Promise.resolve(service.service(payload, req)).then(service.selector);
     } else {
       services[name] = service.service;
       SELECTOR_LIST[name] = service.selector;
