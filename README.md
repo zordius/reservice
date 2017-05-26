@@ -108,7 +108,8 @@ const nowLoadingReducer = (state = initialState, action) => {
     return state;
   }
 
-  // service started, remeber to set nowLoading to false in yourown reducers.
+  // service started, remeber to set nowLoading to false in yourown reducers
+  // you can set different loading states by checking action.reservice.name
   return { ...state, nowLoading: true };
 }
 ```
