@@ -650,6 +650,7 @@ describe('reservice', () => {
     });
 
     it('should warn when not in test env', () => {
+      /* eslint no-console: 0 */
       spyOn(console, 'warn');
       process.env.NODE_ENV = 'bala';
       resetServiceList();
