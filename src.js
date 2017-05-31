@@ -173,15 +173,19 @@ const convertError = (err) => {
   return E;
 };
 
-
 const transportServiceToServer = action => yfetch({
   json: true,
   method: SERVICE_TRANSPORT_METHOD,
   url: SERVICE_TRANSPORT_PATH,
   credentials: 'include',
   body: JSON.stringify(action),
-}).then(response =>
-  ((response.status === 555) ? convertError(response.body) : response.body));
+}).then((response) => {
+  const act = response.body;
+  if (act.error) {
+    act.payload = convertError(act.payload);
+  }
+  return act;
+});
 
 export const setupServiceEndpoint = (url, method = DEFAULT_TRANSPORT_METHOD) => {
   if (SERVICE_LIST) {
@@ -224,26 +228,22 @@ export const serviceMiddleware = store => next => (action) => {
 
   debugStart('name: %s - payload: %o', action.reservice.name, action.payload);
 
-  let job;
+  const handle = handleServiceResult(store, next, action);
 
   // When no SERVICE_LIST, go client logic
   if (!SERVICE_LIST) {
     if (!global.window) {
       throw new ReserviceError('Wrong serviceMiddleware() at server side! You should create service middleware by serviceMiddleware(serviceList) !');
     }
-    job = transportServiceToServer(action);
-  } else {
-    job = executeServiceAtServer(action, store.req || new ReserviceError('Access request without dispatching settleRequest(req) action!'));
+    return transportServiceToServer(action).then(res => store.dispatch(res), handle);
   }
 
-  const handle = handleServiceResult(store, next, action);
-
-  return job.then(handle, handle);
+  return executeServiceAtServer(action, store.req || new ReserviceError('Access request without dispatching settleRequest(req) action!'))
+  .then(handle, handle);
 };
 
-const responseServiceResult = res => result => res.send(JSON.stringify(result));
-const responseServiceError = res =>
-  err => res.status(555).send(JSON.stringify(err, serializeError));
+const responseServiceResult = (res, action) =>
+  result => res.send(JSON.stringify(resultAction(action, result), serializeError));
 
 export const devSelect = selector => result => ((process.env.NODE_ENV === 'development') ? selector(result) : result);
 export const prodSelect = selector => result => ((process.env.NODE_ENV === 'production') ? selector(result) : result);
@@ -327,7 +327,8 @@ export const createMiddlewareByServiceList = (serviceList) => {
     debugReceive('name: %s - payload: %o', action.reservice.name, action.payload);
 
     // no matter success or failed, response result to client.
+    const handle = responseServiceResult(res, action);
     return executeServiceAtServer(action, req)
-    .then(responseServiceResult(res), responseServiceError(res));
+    .then(handle, handle);
   };
 };

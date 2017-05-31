@@ -40,13 +40,13 @@ describe('reservice', () => {
     nock(mockServerHOST)
     .persist()
     .post(mockServerPATH, /err1/)
-    .reply(555, { message: 'err1 message' })
+    .reply(200, { error: true, payload: { message: 'err1 message' } })
     .post(mockServerPATH, /err2/)
-    .reply(555, { message: 'err2 message', action: 'foo' })
+    .reply(200, { error: true, payload: { message: 'err2 message', action: 'foo' } })
     .post(mockServerPATH, /err3/)
-    .reply(555, { message: 'err3 message', stack: 'haha?' })
+    .reply(200, { error: true, payload: {message: 'err3 message', stack: 'haha?' } })
     .post(mockServerPATH)
-    .reply(200, { foo: 'OK' });
+    .reply(200, { payload: { foo: 'OK' } });
   });
 
   afterAll(() => {
@@ -256,21 +256,7 @@ describe('reservice', () => {
       const store = mockStore();
       return serviceMiddleware(store)(() => 0)(createService('foo')()).then(() => {
         expect(store.dispatch).toHaveBeenCalledWith({
-          type: 'foo',
           payload: { foo: 'OK' },
-          error: false,
-          meta: undefined,
-          reservice: {
-            name: 'foo',
-            state: 'END',
-            previous_action: {
-              type: 'CALL_RESERVICE',
-              reservice: {
-                name: 'foo',
-                state: 'CREATED',
-              },
-            },
-          },
         });
       });
     });
@@ -279,21 +265,8 @@ describe('reservice', () => {
       const store = mockStore();
       return serviceMiddleware(store)(() => 0)(createService('err1')()).then(() => {
         expect(store.dispatch).toHaveBeenCalledWith({
-          type: 'err1',
           payload: new Error('err1 message'),
           error: true,
-          meta: undefined,
-          reservice: {
-            name: 'err1',
-            state: 'END',
-            previous_action: {
-              type: 'CALL_RESERVICE',
-              reservice: {
-                name: 'err1',
-                state: 'CREATED',
-              },
-            },
-          },
         });
       });
     });
@@ -302,21 +275,8 @@ describe('reservice', () => {
       const store = mockStore();
       return serviceMiddleware(store)(() => 0)(createService('err2')()).then(() => {
         expect(store.dispatch).toHaveBeenCalledWith({
-          type: 'err2',
           payload: new ReserviceError('err2 message', { action: 'foo' }),
           error: true,
-          meta: undefined,
-          reservice: {
-            name: 'err2',
-            state: 'END',
-            previous_action: {
-              type: 'CALL_RESERVICE',
-              reservice: {
-                name: 'err2',
-                state: 'CREATED',
-              },
-            },
-          },
         });
       });
     });
@@ -325,21 +285,8 @@ describe('reservice', () => {
       const store = mockStore();
       return serviceMiddleware(store)(() => 0)(createService('err3')()).then(() => {
         expect(store.dispatch).toHaveBeenCalledWith({
-          type: 'err3',
           payload: new ReserviceError('err3 message', { action: 'foo' }),
           error: true,
-          meta: undefined,
-          reservice: {
-            name: 'err3',
-            state: 'END',
-            previous_action: {
-              type: 'CALL_RESERVICE',
-              reservice: {
-                name: 'err3',
-                state: 'CREATED',
-              },
-            },
-          },
         });
       });
     });
@@ -404,8 +351,24 @@ describe('reservice', () => {
       middleware(req, {
         send: (act) => {
           expect(act).toEqual(JSON.stringify({
-            p1: { good: 'morning' },
-            p2: req,
+            type: 'bar',
+            reservice: {
+              name: 'bar',
+              state: 'END',
+              previous_action: {
+                type: 'CALL_RESERVICE',
+                payload: { good: 'morning' },
+                reservice: {
+                  name: 'bar',
+                  state: 'BEGIN',
+                },
+              },
+            },
+            payload: {
+              p1: { good: 'morning' },
+              p2: req,
+            },
+            error: false,
           }));
           done();
         },
@@ -425,20 +388,34 @@ describe('reservice', () => {
         },
       };
       middleware(req, {
-        status: code => ({ send: (err) => {
-          expect(code).toEqual(555);
+        send: (err) => {
           expect(err).toEqual(JSON.stringify({
-            message: 'can not find service named as "not_found" in serviceList',
-            action: {
-              type: 'CALL_RESERVICE',
-              reservice: {
-                name: 'not_found',
-                state: 'CREATED',
+            type: 'not_found',
+            reservice: {
+              name: 'not_found',
+              state: 'END',
+              previous_action: {
+                type: 'CALL_RESERVICE',
+                reservice: {
+                  name: 'not_found',
+                  state: 'CREATED',
+                },
               },
             },
+            payload: {
+              message: 'can not find service named as "not_found" in serviceList',
+              action: {
+                type: 'CALL_RESERVICE',
+                reservice: {
+                  name: 'not_found',
+                  state: 'CREATED',
+                },
+              },
+            },
+            error: true,
           }));
           done();
-        } }),
+        },
       });
     });
 
@@ -455,13 +432,27 @@ describe('reservice', () => {
         },
       };
       middleware(req, {
-        status: code => ({ send: (err) => {
-          expect(code).toEqual(555);
+        send: (err) => {
           expect(err).toEqual(JSON.stringify({
-            message: 'bad',
+            type: 'err',
+            reservice: {
+              name: 'err',
+              state: 'END',
+              previous_action: {
+                type: 'CALL_RESERVICE',
+                reservice: {
+                  name: 'err',
+                  state: 'BEGIN',
+                },
+              },
+            },
+            payload: {
+              message: 'bad',
+            },
+            error: true,
           }));
           done();
-        } }),
+        },
       });
     });
   });
