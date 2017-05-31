@@ -44,7 +44,7 @@ describe('reservice', () => {
     .post(mockServerPATH, /err2/)
     .reply(200, { error: true, payload: { message: 'err2 message', action: 'foo' } })
     .post(mockServerPATH, /err3/)
-    .reply(200, { error: true, payload: {message: 'err3 message', stack: 'haha?' } })
+    .reply(200, { error: true, payload: { message: 'err3 message', stack: 'haha?' } })
     .post(mockServerPATH)
     .reply(200, { payload: { foo: 'OK' } });
   });
