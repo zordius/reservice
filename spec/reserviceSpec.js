@@ -668,7 +668,7 @@ describe('reservice', () => {
               },
             },
           },
-        }])
+        }]);
         expect(store.dispatch.calls.argsFor(1)).toEqual([{
           type: 'sel',
           payload: { moo: 'ha' },
