@@ -71,7 +71,7 @@ describe('reservice', () => {
 
   describe('createService()', () => {
     it('should return action creator', () => {
-      expect(typeof createService({})).toBe('function');
+      expect(typeof createService()).toBe('function');
     });
 
     it('should keep service name in .toString()', () => {
@@ -96,7 +96,6 @@ describe('reservice', () => {
 
     it('should handle payload creator correctly', () => {
       const payloadCreator = (arg1, arg2) => ({ foo: arg1, bar: arg2 });
-
       expect(createService('SERVICE_NAME', payloadCreator)('yo', 'ya')).toEqual({
         type: 'CALL_RESERVICE',
         payload: {
@@ -108,6 +107,56 @@ describe('reservice', () => {
           start: undefined,
           state: 'CREATED',
         },
+      });
+    });
+
+    describe('one param interface', () => {
+      it('should provide default payload logic', () => {
+        expect(createService({
+          endType: 'thisIsService',
+        })('yo', 'ya')).toEqual({
+          type: 'CALL_RESERVICE',
+          payload: 'yo',
+          reservice: {
+            name: 'thisIsService',
+            start: undefined,
+            state: 'CREATED',
+          },
+        });
+      });
+
+      it('should handle payload creator correctly', () => {
+        const payloadCreator = (arg1, arg2) => ({ foo: arg1, bar: arg2 });
+        expect(createService({
+          endType: 'SERVICE_NAME',
+          payloadCreator,
+        })('yo', 'ya')).toEqual({
+          type: 'CALL_RESERVICE',
+          payload: {
+            foo: 'yo',
+            bar: 'ya',
+          },
+          reservice: {
+            name: 'SERVICE_NAME',
+            start: undefined,
+            state: 'CREATED',
+          },
+        });
+      });
+
+      it('should handle startType correctly', () => {
+        expect(createService({
+          startType: 'thisIsGood',
+          endType: 'thisIsService',
+        })('yo', 'ya')).toEqual({
+          type: 'CALL_RESERVICE',
+          payload: 'yo',
+          reservice: {
+            name: 'thisIsService',
+            start: 'thisIsGood',
+            state: 'CREATED',
+          },
+        });
       });
     });
   });

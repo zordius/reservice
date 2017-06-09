@@ -23,7 +23,7 @@ const debugSelect = debug('reservice:select');
 const debugFail = debug('reservice:fail');
 const debugError = debug('reservice:error');
 
-export const createService = (params, ...options) => {
+export const createService = (params = {}, ...options) => {
   let actionCreator;
   let name = params;
   let start;
