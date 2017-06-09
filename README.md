@@ -145,6 +145,58 @@ Debug
   * `reservice:error` : show service name, payload and error.stack when service failed
   * `reservice:select` : show service name, payload and selected result when service successed, refer to <a href="https://github.com/zordius/reservice#advanced-usage-selector">selector</a>.
 
+Optional Usage: createService
+-----------------------------
+
+If you plan to migrate from redux-thunk and prefer to reuse your action type, you may specify the startType and endType when you createService.
+
+```javascript
+const doSomeThing = createService({
+  endType: 'DO_SOMETHING',
+  startType: 'DO_SOMETHING_STARTED',
+  payloadCreator,
+  metaCreator,
+});
+
+store.dispatch(doSomeThing('good'));
+
+expect(store.dispatch.calls.argsFor(0)).toEqual([{
+  type: 'CALL_RESERVICE',
+  payload: 'good',
+  reservice: {
+    name: 'DO_SOMETHING',
+    start: 'DO_SOMETHING_STARTED',
+    state: 'CREATED',
+  },
+}]);
+
+// After the reservice middleware handled the action,
+// another action will be dispatched.
+expect(store.dispatch.calls.argsFor(1)).toEqual([{
+  type: 'DO_SOMETHING_STARTED',
+  payload: 'good',
+  reservice: {
+    name: 'DO_SOMETHING',
+    start: 'DO_SOMETHING_STARTED',
+    state: 'CREATED',
+    ...
+  },
+}]);
+
+// After the service is done, this action will be dispatched.
+expect(store.dispatch.calls.argsFor(2)).toEqual([{
+  type: 'DO_SOMETHING',
+  payload: 'the result...',
+  error: false,
+  reservice: {
+    name: 'DO_SOMETHING',
+    start: 'DO_SOMETHING_STARTED',
+    state: 'END',
+    ...
+  },
+}]);
+```
+
 Optional Usage: Selector
 ------------------------
 
