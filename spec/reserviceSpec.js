@@ -644,6 +644,56 @@ describe('reservice', () => {
         });
       });
     });
+
+    it('should disptch another action when action.service.start is defined', () => {
+      const store = mockStore();
+      return serviceMiddleware(store)(() => 0)(createService({
+        endType: 'sel',
+        startType: 'babala',
+      })(456)).then(() => {
+        expect(store.dispatch.calls.argsFor(0)).toEqual([{
+          type: 'babala',
+          payload: 456,
+          reservice: {
+            name: 'sel',
+            start: 'babala',
+            state: 'CREATED',
+            previous_action: {
+              type: 'CALL_RESERVICE',
+              payload: 456,
+              reservice: {
+                name: 'sel',
+                start: 'babala',
+                state: 'BEGIN',
+              },
+            },
+          },
+        }])
+        expect(store.dispatch.calls.argsFor(1)).toEqual([{
+          type: 'sel',
+          payload: { moo: 'ha' },
+          error: false,
+          meta: undefined,
+          reservice: {
+            name: 'sel',
+            start: 'babala',
+            state: 'END',
+            full_result: {
+              foo: { bar: { moo: 'ha' } },
+            },
+            previous_action: {
+              type: 'CALL_RESERVICE',
+              payload: 456,
+              reservice: {
+                name: 'sel',
+                start: 'babala',
+                state: 'BEGIN',
+              },
+            },
+          },
+        }]);
+      });
+    });
   });
 
   describe('devSelect()', () => {

@@ -239,6 +239,16 @@ export const serviceMiddleware = store => next => (action) => {
   }
 
   debugStart('name: %s - payload: %o', action.reservice.name, action.payload);
+  if (action.reservice.start) {
+    store.dispatch({
+      ...action,
+      reservice: {
+        ...action.reservice,
+        previous_action: action,
+      },
+      type: action.reservice.start,
+    });
+  }
 
   const handle = handleServiceResult(store, next, action);
 
