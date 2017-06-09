@@ -23,13 +23,25 @@ const debugSelect = debug('reservice:select');
 const debugFail = debug('reservice:fail');
 const debugError = debug('reservice:error');
 
-export const createService = (name, payloadCreator, metaCreator) => {
-  const actionCreator = createAction(ACTION_TYPE_RESERVICE, payloadCreator, metaCreator);
+export const createService = (params, ...options) => {
+  let actionCreator;
+  let name = params;
+  let start;
+
+  if (typeof params === 'string') {
+    actionCreator = createAction(ACTION_TYPE_RESERVICE, ...options);
+  } else {
+    name = params.endType;
+    start = params.startType;
+    const { payloadCreator, metaCreator } = params;
+    actionCreator = createAction(ACTION_TYPE_RESERVICE, payloadCreator, metaCreator);
+  }
 
   const serviceCreator = function serviceCreator(...args) {
     const action = actionCreator(...args);
     action.reservice = {
       name,
+      start,
       state: STATE_CREATED,
     };
     return action;

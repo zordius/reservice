@@ -71,7 +71,7 @@ describe('reservice', () => {
 
   describe('createService()', () => {
     it('should return action creator', () => {
-      expect(typeof createService()).toBe('function');
+      expect(typeof createService({})).toBe('function');
     });
 
     it('should keep service name in .toString()', () => {
@@ -88,6 +88,7 @@ describe('reservice', () => {
         payload: 'yo',
         reservice: {
           name: 'thisIsService',
+          start: undefined,
           state: 'CREATED',
         },
       });
@@ -104,6 +105,7 @@ describe('reservice', () => {
         },
         reservice: {
           name: 'SERVICE_NAME',
+          start: undefined,
           state: 'CREATED',
         },
       });
@@ -521,11 +523,13 @@ describe('reservice', () => {
           reservice: {
             name: 'foo',
             state: 'END',
+            start: undefined,
             previous_action: {
               type: 'CALL_RESERVICE',
               payload: 456,
               reservice: {
                 name: 'foo',
+                start: undefined,
                 state: 'BEGIN',
               },
             },
@@ -548,12 +552,14 @@ describe('reservice', () => {
           reservice: {
             name: 'bar',
             state: 'END',
+            start: undefined,
             previous_action: {
               type: 'CALL_RESERVICE',
               payload: 456,
               reservice: {
                 name: 'bar',
                 state: 'BEGIN',
+                start: undefined,
               },
             },
           },
@@ -571,6 +577,7 @@ describe('reservice', () => {
           meta: undefined,
           reservice: {
             name: 'sel',
+            start: undefined,
             state: 'END',
             full_result: {
               foo: { bar: { moo: 'ha' } },
@@ -580,6 +587,7 @@ describe('reservice', () => {
               payload: 456,
               reservice: {
                 name: 'sel',
+                start: undefined,
                 state: 'BEGIN',
               },
             },
@@ -671,12 +679,14 @@ describe('reservice', () => {
           meta: undefined,
           reservice: {
             name: 'sel',
+            start: undefined,
             state: 'END',
             previous_action: {
               type: 'CALL_RESERVICE',
               payload: 456,
               reservice: {
                 name: 'sel',
+                start: undefined,
                 state: 'BEGIN',
               },
             },
