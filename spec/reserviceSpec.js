@@ -14,6 +14,7 @@ describe('reservice', () => {
   const doneService = (name) => {
     const act = createService(name)();
     act.reservice.state = 'END';
+    act.reservice.previous_action = { mock: 'foo' };
     return act;
   };
 

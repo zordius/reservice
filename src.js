@@ -23,6 +23,7 @@ const debugSelect = debug('reservice:select');
 const debugFail = debug('reservice:fail');
 const debugError = debug('reservice:error');
 
+// A helper function to help you to create actionCreator for a service
 export const createService = (params = {}, ...options) => {
   let actionCreator;
   let name = params;
@@ -74,8 +75,6 @@ export const resetServiceList = () => {
   SERVICE_LIST = 0;
   Object.keys(SELECTOR_LIST).forEach(name => delete SELECTOR_LIST[name]);
 };
-
-// A helper function to help you to create actionCreator for a service
 
 const resultAction = (action, payload) => {
   const error = payload instanceof Error;
@@ -139,8 +138,6 @@ export const isService = (action = {}, returnErrorAction) => {
 
   return true;
 };
-
-const isEnd = action => action.reservice.state === STATE_END;
 
 const handleServiceResult =
 (store, next, action) => result => store.dispatch(resultAction(action, result));
@@ -234,7 +231,7 @@ export const serviceMiddleware = store => next => (action) => {
   const result = next(action);
 
   // just pass to next when the service is already done
-  if (isEnd(action)) {
+  if (action.reservice.previous_action) {
     return result;
   }
 
