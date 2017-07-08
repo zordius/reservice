@@ -349,7 +349,6 @@ describe('reservice', () => {
         expect(store.dispatch.calls.argsFor(0)[0].payload.stack).toEqual('yo');
       });
     });
-
   });
 
   describe('setupServiceEndpoint() error', () => {
