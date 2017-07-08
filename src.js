@@ -175,9 +175,9 @@ const convertError = (err) => {
     ? new ReserviceError(err.message, err.action)
     : new Error(err.message);
 
-  if (err.stack) {
-    E.stack = err.stack;
-  }
+  delete err.action;
+  delete err.message;
+  Object.assign(E, err);
 
   return E;
 };

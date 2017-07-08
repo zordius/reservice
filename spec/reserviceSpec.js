@@ -46,6 +46,8 @@ describe('reservice', () => {
     .reply(200, { error: true, payload: { message: 'err2 message', action: 'foo' } })
     .post(mockServerPATH, /err3/)
     .reply(200, { error: true, payload: { message: 'err3 message', stack: 'haha?' } })
+    .post(mockServerPATH, /err4/)
+    .reply(200, { error: true, payload: { message: 'err4 message', stack: 'yo', foo: 'bar' } })
     .post(mockServerPATH)
     .reply(200, { payload: { foo: 'OK' } });
   });
@@ -336,12 +338,18 @@ describe('reservice', () => {
     it('should receive stack from server', () => {
       const store = mockStore();
       return serviceMiddleware(store)(() => 0)(createService('err3')()).then(() => {
-        expect(store.dispatch).toHaveBeenCalledWith({
-          payload: new ReserviceError('err3 message', { action: 'foo' }),
-          error: true,
-        });
+        expect(store.dispatch.calls.argsFor(0)[0].payload.stack).toEqual('haha?');
       });
     });
+
+    it('should receive extra error props from server', () => {
+      const store = mockStore();
+      return serviceMiddleware(store)(() => 0)(createService('err4')()).then(() => {
+        expect(store.dispatch.calls.argsFor(0)[0].payload.foo).toEqual('bar');
+        expect(store.dispatch.calls.argsFor(0)[0].payload.stack).toEqual('yo');
+      });
+    });
+
   });
 
   describe('setupServiceEndpoint() error', () => {
