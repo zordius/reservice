@@ -145,6 +145,20 @@ Debug
   * `reservice:error` : show service name, payload and error.stack when service failed
   * `reservice:select` : show service name, payload and selected result when service successed, refer to <a href="https://github.com/zordius/reservice#advanced-usage-selector">selector</a>.
 
+Optional Usage: Change Default Setting
+--------------------------------------
+
+You can change default service path and method by this way:
+
+```javascript
+import { setupServiceEndpoint } from 'reservice';
+
+setupServiceEndpoint('/mypath/my_service/');
+
+// Or also change http method
+setupServiceEndpoint('/another/path/ok', 'POST');
+```
+
 Optional Usage: createService
 -----------------------------
 
