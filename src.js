@@ -256,12 +256,8 @@ export const serviceMiddleware = store => next => (action) => {
     }
     return transportServiceToServer(action).then(res => store.dispatch(res), handle);
   }
-
-  return Promise.resolve(
-    executeServiceAtServer(action, store.req || new ReserviceError('Access request without dispatching settleRequest(req) action!')).then(handle),
-  ).catch((err) => {
-    handle(err);
-  });
+  
+  return executeServiceAtServer(action, store.req || new ReserviceError('Access request without dispatching settleRequest(req) action!')).then(handle);
 };
 
 const responseServiceResult = (res, action) =>
