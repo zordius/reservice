@@ -258,9 +258,9 @@ export const serviceMiddleware = store => next => (action) => {
   }
 
   return Promise.resolve(
-    executeServiceAtServer(action, store.req || new ReserviceError('Access request without dispatching settleRequest(req) action!')).then(handle)
+    executeServiceAtServer(action, store.req || new ReserviceError('Access request without dispatching settleRequest(req) action!')).then(handle),
   ).catch((err) => {
-    handle(err)
+    handle(err);
   });
 };
 
