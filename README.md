@@ -233,7 +233,7 @@ const mySelector = result => ({
 import { prodSelect } from 'reservice';
 // Run your selector only when in production environment, keep original result when in development environment.
 const myProdSelector = prodSelect(mySelector);
-const myService = payload => callAPI(payload).then(result => myRrodSelector(result));
+const myService = payload => callAPI(payload).then(result => myProdSelector(result));
 
 // In a reducer
 import { devSelect } from 'reservice';
