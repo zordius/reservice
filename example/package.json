@@ -34,7 +34,7 @@
     "redux-actions": "^2.0.2",
     "reservice": "*",
     "routr": "^2.1.0",
-    "serialize-javascript": "^2.1.1",
+    "serialize-javascript": "^4.0.0",
     "yelp": "^1.0.2",
     "yfetch": "0.0.2"
   },
